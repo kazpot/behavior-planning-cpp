@@ -56,15 +56,6 @@ double Costfunction::inefficiency_cost(Vehicle vehicle, vector<Vehicle::Snapshot
     double pct = double(diff) / target_speed;
     double multiplier = pow(pct, 2);
     return multiplier * EFFICIENCY;
-
-/*
-    speed = data.avg_speed
-    target_speed = vehicle.target_speed
-    diff = target_speed - speed
-    pct = float(diff) / target_speed
-    multiplier = pct ** 2
-    return multiplier * EFFICIENCY
-*/
 }
 
 
@@ -77,15 +68,6 @@ double Costfunction::collision_cost(Vehicle vehicle, vector<Vehicle::Snapshot> t
         return multiplier * COLLISION;
     }
     return 0.0;
-/*
-    if data.collides:
-        time_til_collision = data.collides['at']
-        exponent = (float(time_til_collision) ) ** 2
-        mult = exp(-exponent)
-
-        return mult * COLLISION
-    return 0
-*/
 }
 
 double Costfunction::buffer_cost(Vehicle vehicle, vector<Vehicle::Snapshot> trajectory, map<int,vector<vector<int>>> predictions, Costfunction::TrajectoryData data){
@@ -101,18 +83,6 @@ double Costfunction::buffer_cost(Vehicle vehicle, vector<Vehicle::Snapshot> traj
     }
     double multiplier = 1.0 - pow(timesteps_away / DESIRED_BUFFER, 2);
     return multiplier * DANGER;
-/*
-    closest = data.closest_approach
-    if closest == 0:
-        return 10 * DANGER
-
-    timesteps_away = closest / data.avg_speed
-    if timesteps_away > DESIRED_BUFFER:
-        return 0.0
-    
-    multiplier = 1.0 - (timesteps_away / DESIRED_BUFFER)**2
-    return multiplier * DANGER
-*/
 }
 
 double Costfunction::calculate_cost(Vehicle& vehicle, vector<Vehicle::Snapshot> trajectory, map<int,vector<vector<int>>> predictions, bool verbose=false){
@@ -129,23 +99,6 @@ double Costfunction::calculate_cost(Vehicle& vehicle, vector<Vehicle::Snapshot> 
     cost += this->change_lane_cost(vehicle, trajectory, predictions, trajectory_data);
 
     return cost;
-
-/*
-    trajectory_data = get_helper_data(vehicle, trajectory, predictions)
-    cost = 0.0
-    for cf in [
-        distance_from_goal_lane,
-        inefficiency_cost,
-        collision_cost,
-        buffer_cost,
-        change_lane_cost]:
-        new_cost = cf(vehicle, trajectory, predictions, trajectory_data)
-        if DEBUG or verbose:
-            print "{} has cost {} for lane {}".format(cf.__name__, new_cost, trajectory[-1].lane)
-            # pdb.set_trace()
-        cost += new_cost
-    return cost
-*/
 }
 
 Costfunction::TrajectoryData Costfunction::get_helper_data(Vehicle vehicle, vector<Vehicle::Snapshot> trajectory, map<int,vector<vector<int>>> predictions){
@@ -215,56 +168,6 @@ Costfunction::TrajectoryData Costfunction::get_helper_data(Vehicle vehicle, vect
     trajectory_data.collides = collides;
 
     return trajectory_data;
-
-    
-/*
-    t = trajectory
-    current_snapshot = t[0]
-    first = t[1]
-    last = t[-1]
-    end_distance_to_goal = vehicle.goal_s - last.s
-    end_lanes_from_goal = abs(vehicle.goal_lane - last.lane)
-    dt = float(len(trajectory))
-    proposed_lane = first.lane
-    avg_speed = (last.s - current_snapshot.s) / dt
-
-    # initialize a bunch of variables
-    accels = []
-    closest_approach = 999999
-    collides = False
-    last_snap = trajectory[0]
-    filtered = filter_predictions_by_lane(predictions, proposed_lane)
-
-    for i, snapshot in enumerate(trajectory[1:PLANNING_HORIZON+1], 1):
-        lane, s, v, a = unpack_snapshot(snapshot)
-
-        accels.append(a)
-        for v_id, v in filtered.items():
-            state = v[i]
-            last_state = v[i-1]
-            vehicle_collides = check_collision(snapshot, last_state['s'], state['s'])
-            if vehicle_collides:
-                collides = True
-                collides = {"at" : i}
-            dist = abs(state['s'] - s)
-            if dist < closest_approach:
-                closest_approach = dist
-        last_snap = snapshot
-    max_accel = max(accels, key=lambda a: abs(a))
-    rms_accels = [a**2 for a in accels]
-    num_accels = len(rms_accels)
-    rms_acceleration = float(sum(rms_accels)) / num_accels
-
-    return TrajectoryData(
-        proposed_lane, 
-        avg_speed, 
-        max_accel, 
-        rms_acceleration, 
-        closest_approach, 
-        end_distance_to_goal,
-        end_lanes_from_goal,
-        collides)
-*/
 }
 
 bool Costfunction::check_collision(Vehicle::Snapshot snapshot, double s_previous, double s_now){
@@ -294,30 +197,6 @@ bool Costfunction::check_collision(Vehicle::Snapshot snapshot, double s_previous
             return true;
         }
     }
-
-/*
-    s = snapshot.s
-    v = snapshot.v
-    v_target = s_now - s_previous
-    if s_previous < s:
-        if s_now >= s:
-            return True
-        else:
-            return False
-
-    if s_previous > s:
-        if s_now <= s:
-            return True
-        else:
-            return False
-
-    if s_previous == s:
-        if v_target > v:
-            return False
-        else:
-            return True
-    raise ValueError 
-*/
 }
 
 map<int,vector<vector<int>>> Costfunction::filter_predictions_by_lane(map<int,vector<vector<int>>> predictions, int lane){
@@ -331,11 +210,4 @@ map<int,vector<vector<int>>> Costfunction::filter_predictions_by_lane(map<int,ve
         }
     }
     return filtered;
-/*
-    filtered = {}
-    for v_id, predicted_traj in predictions.items():
-        if predicted_traj[0]['lane'] == lane and v_id != -1:
-            filtered[v_id] = predicted_traj
-    return filtered
-*/
 }
