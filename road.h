@@ -1,8 +1,11 @@
+#ifndef ROAD_H
+#define ROAD_H
+
 #include <iostream>
 #include <random>
 #include <sstream>
 #include <fstream>
-#include <math.h>
+#include <cmath>
 #include <vector>
 #include <set>
 #include <map>
@@ -58,3 +61,5 @@ public:
     void cull();
 
 };
+
+#endif

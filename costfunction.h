@@ -1,5 +1,6 @@
 #ifndef COSTFUNCTION_H
 #define COSTFUNCTION_H
+
 #include <iostream>
 #include <random>
 #include <sstream>
@@ -69,7 +70,5 @@ public:
 
     map<int,vector<vector<int>>> filter_predictions_by_lane(map<int,vector<vector<int>>> predictions, int lane);
 };
-
-
 
 #endif
