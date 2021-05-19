@@ -5,16 +5,17 @@
 #include <random>
 #include <sstream>
 #include <fstream>
-#include <math.h>
+#include <cmath>
 #include <vector>
 #include <map>
 #include <string>
 #include <iterator>
 
-class Vehicle {
+class Vehicle
+{
 public:
 
-  struct collider{
+  struct Collider{
     bool collision ; // is there a collision?
     int  time; // time collision happens
   };
@@ -62,7 +63,7 @@ public:
 
   bool collides_with(Vehicle other, int at_time);
 
-  collider will_collide_with(Vehicle other, int timesteps);
+  Collider will_collide_with(Vehicle other, int timesteps);
 
   void realize_state(std::map<int, std::vector<std::vector<int>>> predictions);
 
@@ -76,7 +77,7 @@ public:
 
   void realize_prep_lane_change(std::map<int,std::vector<std::vector<int>>> predictions, std::string direction);
 
-    std::vector<std::vector<int> > generate_predictions(int horizon);
+  std::vector<std::vector<int> > generate_predictions(int horizon);
 
   std::string get_next_state(std::map<int,std::vector<std::vector<int>>> predictions);
 
