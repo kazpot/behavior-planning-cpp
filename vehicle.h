@@ -15,12 +15,14 @@ class Vehicle
 {
 public:
 
-  struct Collider{
-    bool collision ; // is there a collision?
-    int  time; // time collision happens
+  struct Collider
+  {
+      bool collision;
+      int  time;
   };
 
-  struct Snapshot{
+  struct Snapshot
+  {
       int lane;
       int s;
       int v;
