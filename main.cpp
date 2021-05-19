@@ -2,16 +2,14 @@
 #include "vehicle.h"
 #include <iostream>
 #include <fstream>
-#include <math.h>
+#include <cmath>
 #include <vector>
-
-using namespace std;
 
 //impacts default behavior for most states
 int SPEED_LIMIT = 10;
 
 //all traffic in lane (besides ego) follow these speeds
-vector<int> LANE_SPEEDS = {6,7,8,9}; 
+std::vector<int> LANE_SPEEDS = {6,7,8,9};
 
 //Number of available "cells" which should have traffic
 double TRAFFIC_DENSITY   = 0.15;
@@ -21,7 +19,7 @@ double TRAFFIC_DENSITY   = 0.15;
 int MAX_ACCEL = 2;
 
 // s value and lane number of goal.
-vector<int> GOAL = {300, 0};
+std::vector<int> GOAL = {300, 0};
 
 // These affect the visualization
 int FRAMES_PER_SECOND = 4;
@@ -41,7 +39,7 @@ int main() {
     //configuration data: speed limit, num_lanes, goal_s, goal_lane, max_acceleration
 
     int num_lanes = LANE_SPEEDS.size();
-    vector<int> ego_config = {SPEED_LIMIT, num_lanes, goal_s, goal_lane, MAX_ACCEL};
+    std::vector<int> ego_config = {SPEED_LIMIT, num_lanes, goal_s, goal_lane, MAX_ACCEL};
      
     road.add_ego(2,0, ego_config);
     int timestep = 0;
@@ -49,7 +47,7 @@ int main() {
     while (road.get_ego().s <= GOAL[0]) {
         timestep++;
         if (timestep > 150) {
-            cout << "Taking too long to reach goal. Go faster!" << endl;
+            std::cout << "Taking too long to reach goal. Go faster!" << std::endl;
             break;
         }
         road.advance();
@@ -59,11 +57,11 @@ int main() {
     Vehicle ego = road.get_ego();
     if (ego.lane == GOAL[1])
     {
-        cout << "You got to the goal in " << timestep << " seconds!" << endl;
+        std::cout << "You got to the goal in " << timestep << " seconds!" << std::endl;
     }
     else
     {
-        cout << "You missed the goal. You are in lane " << ego.lane << " instead of " << GOAL[1] << endl;
+        std::cout << "You missed the goal. You are in lane " << ego.lane << " instead of " << GOAL[1] << std::endl;
     }
 
     return 0;

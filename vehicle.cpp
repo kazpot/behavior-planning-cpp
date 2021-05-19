@@ -2,7 +2,7 @@
 #include "vehicle.h"
 #include "costfunction.h"
 #include <iostream>
-#include <math.h>
+#include <cmath>
 #include <map>
 #include <string>
 #include <iterator>
@@ -26,7 +26,7 @@ Vehicle::Vehicle(int lane, int s, int v, int a) {
 Vehicle::~Vehicle() {}
 
 // TODO - Implement this method.
-void Vehicle::update_state(map<int,vector < vector<int> > > predictions) {
+void Vehicle::update_state(std::map<int,std::vector < std::vector<int> > > predictions) {
     /*
     Updates the "state" of the vehicle by assigning one of the
     following values to 'self.state':
@@ -64,31 +64,31 @@ void Vehicle::update_state(map<int,vector < vector<int> > > predictions) {
     this->state = state;
 }
 
-string Vehicle::get_next_state(map<int,vector<vector<int>>> predictions){
-    vector<string> states = {"KL", "LCL", "LCR"};
+std::string Vehicle::get_next_state(std::map<int,std::vector<std::vector<int>>> predictions){
+    std::vector<std::string> states = {"KL", "LCL", "LCR"};
     if(this->lane==0){
-        vector<string>::iterator result = find(states.begin(), states.end(), "LCL");
+        std::vector<std::string>::iterator result = find(states.begin(), states.end(), "LCL");
         states.erase(result);
     }
     if(this->lane == (this->lanes_available -1)){
-        vector<string>::iterator result = find(states.begin(), states.end(), "LCR");
+        std::vector<std::string>::iterator result = find(states.begin(), states.end(), "LCR");
         states.erase(result);
     }
 
-    double min_cost = numeric_limits<double>::infinity();
+    double min_cost = std::numeric_limits<double>::infinity();
     int min_index = 0;
     Costfunction costf = Costfunction();
     for(int i=0; i < states.size(); i++){
-        map<int,vector<vector<int>>> predictions_copy = predictions;
-        string state = states.at(i);
-        vector<Vehicle::Snapshot> trajectory = this->trajectory_for_state(state,predictions_copy);
+        std::map<int,std::vector<std::vector<int>>> predictions_copy = predictions;
+        std::string state = states.at(i);
+        std::vector<Vehicle::Snapshot> trajectory = this->trajectory_for_state(state,predictions_copy);
         double cost = costf.calculate_cost(*this, trajectory, predictions, false);
         if(cost < min_cost){
             min_cost = cost;
             min_index = i;
         }
     }
-    string state = states.at(min_index);
+    std::string state = states.at(min_index);
     return state;
 
     /*
@@ -110,9 +110,9 @@ string Vehicle::get_next_state(map<int,vector<vector<int>>> predictions){
     */
 }
 
-vector<Vehicle::Snapshot> Vehicle::trajectory_for_state(string state, map<int,vector<vector<int>>> predictions, int horizon){
+std::vector<Vehicle::Snapshot> Vehicle::trajectory_for_state(std::string state, std::map<int,std::vector<std::vector<int>>> predictions, int horizon){
     Vehicle::Snapshot snap = this->snapshot();
-    vector<Vehicle::Snapshot> trajectory;
+    std::vector<Vehicle::Snapshot> trajectory;
     trajectory.push_back(snap);
 
     this->state = state;
@@ -151,7 +151,7 @@ Vehicle::Snapshot Vehicle::snapshot(){
     return snapshot;
 }
 
-void Vehicle::configure(vector<int> road_data) {
+void Vehicle::configure(std::vector<int> road_data) {
     /*
     Called by simulator before simulation begins. Sets various
     parameters which will impact the ego vehicle. 
@@ -163,9 +163,9 @@ void Vehicle::configure(vector<int> road_data) {
     goal_s = road_data[4];
 }
 
-string Vehicle::display() {
+std::string Vehicle::display() {
 
-    ostringstream oss;
+    std::ostringstream oss;
     
     oss << "s:    " << this->s << "\n";
     oss << "lane: " << this->lane << "\n";
@@ -181,7 +181,7 @@ void Vehicle::increment(int dt = 1) {
     this->v += this->a * dt;
 }
 
-vector<int> Vehicle::state_at(int t) {
+std::vector<int> Vehicle::state_at(int t) {
 
     /*
     Predicts state of vehicle in t seconds (assuming constant acceleration)
@@ -196,8 +196,8 @@ bool Vehicle::collides_with(Vehicle other, int at_time) {
     /*
     Simple collision detection.
     */
-    vector<int> check1 = state_at(at_time);
-    vector<int> check2 = other.state_at(at_time);
+    std::vector<int> check1 = state_at(at_time);
+    std::vector<int> check2 = other.state_at(at_time);
     return (check1[0] == check2[0]) && (abs(check1[1]-check2[1]) <= L);
 }
 
@@ -220,13 +220,13 @@ Vehicle::collider Vehicle::will_collide_with(Vehicle other, int timesteps) {
     return collider_temp;
 }
 
-void Vehicle::realize_state(map<int,vector<vector<int>>> predictions) {
+void Vehicle::realize_state(std::map<int,std::vector<std::vector<int>>> predictions) {
    
     /*
     Given a state, realize it by adjusting acceleration and lane.
     Note - lane changes happen instantaneously.
     */
-    string state = this->state;
+    std::string state = this->state;
     if(state.compare("CS") == 0)
     {
         realize_constant_speed();
@@ -258,19 +258,19 @@ void Vehicle::realize_constant_speed() {
     a = 0;
 }
 
-int Vehicle::_max_accel_for_lane(map<int,vector<vector<int> > > predictions, int lane, int s) {
+int Vehicle::_max_accel_for_lane(std::map<int,std::vector<std::vector<int> > > predictions, int lane, int s) {
 
     int delta_v_til_target = target_speed - v;
-    int max_acc = min(max_acceleration, delta_v_til_target);
+    int max_acc = std::min(max_acceleration, delta_v_til_target);
 
-    map<int, vector<vector<int> > >::iterator it = predictions.begin();
-    vector<vector<vector<int> > > in_front;
+    std::map<int, std::vector<std::vector<int> > >::iterator it = predictions.begin();
+    std::vector<std::vector<std::vector<int> > > in_front;
     while(it != predictions.end())
     {
        
         int v_id = it->first;
         
-        vector<vector<int> > v = it->second;
+        std::vector<std::vector<int> > v = it->second;
         
         if((v[0][0] == lane) && (v[0][1] > s))
         {
@@ -283,7 +283,7 @@ int Vehicle::_max_accel_for_lane(map<int,vector<vector<int> > > predictions, int
     if(in_front.size() > 0)
     {
         int min_s = 1000;
-        vector<vector<int>> leading = {};
+        std::vector<std::vector<int>> leading = {};
         for(int i = 0; i < in_front.size(); i++)
         {
             if((in_front[i][0][1]-s) < min_s)
@@ -297,18 +297,18 @@ int Vehicle::_max_accel_for_lane(map<int,vector<vector<int> > > predictions, int
         int my_next = s + this->v;
         int separation_next = next_pos - my_next;
         int available_room = separation_next - preferred_buffer;
-        max_acc = min(max_acc, available_room);
+        max_acc = std::min(max_acc, available_room);
     }
     
     return max_acc;
 
 }
 
-void Vehicle::realize_keep_lane(map<int,vector< vector<int> > > predictions) {
+void Vehicle::realize_keep_lane(std::map<int,std::vector< std::vector<int> > > predictions) {
     this->a = _max_accel_for_lane(predictions, this->lane, this->s);
 }
 
-void Vehicle::realize_lane_change(map<int,vector< vector<int> > > predictions, string direction) {
+void Vehicle::realize_lane_change(std::map<int,std::vector< std::vector<int> > > predictions, std::string direction) {
     int delta = -1;
     if (direction.compare("L") == 0)
     {
@@ -320,7 +320,7 @@ void Vehicle::realize_lane_change(map<int,vector< vector<int> > > predictions, s
     this->a = _max_accel_for_lane(predictions, lane, s);
 }
 
-void Vehicle::realize_prep_lane_change(map<int,vector<vector<int> > > predictions, string direction) {
+void Vehicle::realize_prep_lane_change(std::map<int,std::vector<std::vector<int> > > predictions, std::string direction) {
     int delta = -1;
     if (direction.compare("L") == 0)
     {
@@ -328,12 +328,12 @@ void Vehicle::realize_prep_lane_change(map<int,vector<vector<int> > > prediction
     }
     int lane = this->lane + delta;
 
-    map<int, vector<vector<int> > >::iterator it = predictions.begin();
-    vector<vector<vector<int> > > at_behind;
+    std::map<int, std::vector<std::vector<int> > >::iterator it = predictions.begin();
+    std::vector<std::vector<std::vector<int> > > at_behind;
     while(it != predictions.end())
     {
         int v_id = it->first;
-        vector<vector<int> > v = it->second;
+        std::vector<std::vector<int> > v = it->second;
 
         if((v[0][0] == lane) && (v[0][1] <= this->s))
         {
@@ -346,7 +346,7 @@ void Vehicle::realize_prep_lane_change(map<int,vector<vector<int> > > prediction
     {
 
         int max_s = -1000;
-        vector<vector<int> > nearest_behind = {};
+        std::vector<std::vector<int> > nearest_behind = {};
         for(int i = 0; i < at_behind.size(); i++)
         {
             if((at_behind[i][0][1]) > max_s)
@@ -383,7 +383,7 @@ void Vehicle::realize_prep_lane_change(map<int,vector<vector<int> > > prediction
         }
         else
         {
-            int my_min_acc = max(-this->max_acceleration,-delta_s);
+            int my_min_acc = std::max(-this->max_acceleration,-delta_s);
             this->a = my_min_acc;
         }
 
@@ -391,13 +391,13 @@ void Vehicle::realize_prep_lane_change(map<int,vector<vector<int> > > prediction
 
 }
 
-vector<vector<int>> Vehicle::generate_predictions(int horizon = 10) {
+std::vector<std::vector<int>> Vehicle::generate_predictions(int horizon = 10) {
 
-    vector<vector<int> > predictions;
+    std::vector<std::vector<int> > predictions;
     for( int i = 0; i < horizon; i++)
     {
-      vector<int> check1 = state_at(i);
-      vector<int> lane_s = {check1[0], check1[1]};
+      std::vector<int> check1 = state_at(i);
+      std::vector<int> lane_s = {check1[0], check1[1]};
       predictions.push_back(lane_s);
     }
     return predictions;
