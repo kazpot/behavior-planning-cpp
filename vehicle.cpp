@@ -13,14 +13,12 @@
  * Initializes Vehicle
  */
 Vehicle::Vehicle(int lane, int s, int v, int a) {
-
     this->lane = lane;
     this->s = s;
     this->v = v;
     this->a = a;
-    state = "CS";
-    max_acceleration = -1;
-
+    this->state = "CS";
+    this->max_acceleration = -1;
 }
 
 Vehicle::~Vehicle() {}
@@ -201,9 +199,9 @@ bool Vehicle::collides_with(Vehicle other, int at_time) {
     return (check1[0] == check2[0]) && (abs(check1[1]-check2[1]) <= L);
 }
 
-Vehicle::collider Vehicle::will_collide_with(Vehicle other, int timesteps) {
+Vehicle::Collider Vehicle::will_collide_with(Vehicle other, int timesteps) {
 
-    Vehicle::collider collider_temp;
+    Vehicle::Collider collider_temp;
     collider_temp.collision = false;
     collider_temp.time = -1; 
 
