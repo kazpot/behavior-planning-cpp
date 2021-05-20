@@ -28,7 +28,8 @@ const bool DEBUG = false;
 
 class Costfunction{
 public:
-    struct TrajectoryData{
+    struct TrajectoryData
+    {
         int proposed_lane;
         double avg_speed;
         int max_acceleration;

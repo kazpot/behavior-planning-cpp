@@ -53,7 +53,7 @@ public:
   */
   virtual ~Vehicle();
 
-  void update_state(std::map<int, std::vector<std::vector<int>>> predictions);
+  void update_state(std::map<int, std::vector<std::vector<int>>>& predictions);
 
   void configure(std::vector<int> road_data);
 

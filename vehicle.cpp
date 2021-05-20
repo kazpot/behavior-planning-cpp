@@ -24,7 +24,7 @@ Vehicle::Vehicle(int lane, int s, int v, int a) {
 Vehicle::~Vehicle() {}
 
 // TODO - Implement this method.
-void Vehicle::update_state(std::map<int,std::vector < std::vector<int> > > predictions) {
+void Vehicle::update_state(std::map<int, std::vector<std::vector<int>>>& predictions) {
     /*
     Updates the "state" of the vehicle by assigning one of the
     following values to 'self.state':
@@ -58,25 +58,24 @@ void Vehicle::update_state(std::map<int,std::vector < std::vector<int> > > predi
     }
 
     */
-    state = this->get_next_state(predictions);
-    this->state = state;
+    this->state = this->get_next_state(predictions);
 }
 
 std::string Vehicle::get_next_state(std::map<int,std::vector<std::vector<int>>> predictions){
     std::vector<std::string> states = {"KL", "LCL", "LCR"};
-    if(this->lane==0){
-        std::vector<std::string>::iterator result = find(states.begin(), states.end(), "LCL");
+    if (this->lane == 0){
+        auto result = find(states.begin(), states.end(), "LCL");
         states.erase(result);
     }
-    if(this->lane == (this->lanes_available -1)){
-        std::vector<std::string>::iterator result = find(states.begin(), states.end(), "LCR");
+    if (this->lane == (this->lanes_available - 1)){
+        auto result = find(states.begin(), states.end(), "LCR");
         states.erase(result);
     }
 
     double min_cost = std::numeric_limits<double>::infinity();
     int min_index = 0;
     Costfunction costf = Costfunction();
-    for(int i=0; i < states.size(); i++){
+    for (int i = 0; i < states.size(); i++){
         std::map<int,std::vector<std::vector<int>>> predictions_copy = predictions;
         std::string state = states.at(i);
         std::vector<Vehicle::Snapshot> trajectory = this->trajectory_for_state(state,predictions_copy);
