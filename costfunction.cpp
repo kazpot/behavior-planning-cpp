@@ -25,13 +25,13 @@ double Costfunction::change_lane_cost(Vehicle vehicle, std::vector<Vehicle::Snap
     int proposed_lanes = data.end_lanes_from_goal;
     int cur_lanes = trajectory[0].lane;
     double cost = 0;
-    if(proposed_lanes > cur_lanes){
+    if (proposed_lanes > cur_lanes){
         cost = COMFORT;
     }
-    if(proposed_lanes < cur_lanes){
+    if (proposed_lanes < cur_lanes){
         cost = -1.0 * COMFORT;
     }
-    if(cost != 0){
+    if (cost != 0){
         std::cout << "!!cost for lane change is " << cost << "\n\n";
     }
     return cost;
@@ -63,22 +63,24 @@ double Costfunction::collision_cost(Vehicle vehicle, std::vector<Vehicle::Snapsh
 
     if (data.collides.size() > 0){
         int time_til_collision = data.collides["at"];
-        double exponent= (double)pow(time_til_collision,2);
+        double exponent = (double)pow(time_til_collision,2);
         double multiplier = exp(-1 * exponent);
         return multiplier * COLLISION;
     }
     return 0.0;
 }
 
-double Costfunction::buffer_cost(Vehicle vehicle, std::vector<Vehicle::Snapshot> trajectory, std::map<int,std::vector<std::vector<int>>> predictions, Costfunction::TrajectoryData data){
-
+double Costfunction::buffer_cost(Vehicle vehicle, std::vector<Vehicle::Snapshot> trajectory, std::map<int,std::vector<std::vector<int>>> predictions, Costfunction::TrajectoryData data)
+{
     int closest = data.closest_approach;
-    if(closest == 0){
+    if (closest == 0)
+    {
         return 10 * DANGER;
     }
 
     int timesteps_away = closest / data.avg_speed;
-    if(timesteps_away > DESIRED_BUFFER){
+    if (timesteps_away > DESIRED_BUFFER)
+    {
         return 0.0;
     }
     double multiplier = 1.0 - pow(timesteps_away / DESIRED_BUFFER, 2);
