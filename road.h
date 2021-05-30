@@ -45,9 +45,6 @@ public:
     void Display(int timestep);
 
     void AddEgo(int lane_num, int s, std::vector<int> config_data);
-
-    void Cull();
-
 };
 
 #endif
