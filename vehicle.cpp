@@ -30,12 +30,12 @@ std::string Vehicle::GetNextState(std::map<int,std::vector<std::vector<int>>> pr
     std::vector<std::string> states = {"KL", "LCL", "LCR"};
 
     if (this->lane_ == 0){
-        auto result = find(states.begin(), states.end(), "LCL");
+        auto result = find(states.begin(), states.end(), "LCR");
         states.erase(result);
     }
 
     if (this->lane_ == (this->lanes_available_ - 1)){
-        auto result = find(states.begin(), states.end(), "LCR");
+        auto result = find(states.begin(), states.end(), "LCL");
         states.erase(result);
     }
 
@@ -53,7 +53,9 @@ std::string Vehicle::GetNextState(std::map<int,std::vector<std::vector<int>>> pr
             min_cost = cost;
             min_index = i;
         }
+        std::cout << "state of cost: " << states.at(i) << ", cost: " << cost << std::endl;
     }
+    std::cout << "state of min cost: " << states.at(min_index) << ", cost: " << min_cost << std::endl;
     return states.at(min_index);
 }
 

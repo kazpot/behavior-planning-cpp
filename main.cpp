@@ -18,7 +18,7 @@ double TRAFFIC_DENSITY   = 0.15;
 int MAX_ACCEL = 2;
 
 // s value and lane number of goal.
-std::vector<int> GOAL = {500, 1};
+std::vector<int> GOAL = {500, 3};
 
 // These affect the visualization
 int FRAMES_PER_SECOND = 4;
@@ -36,7 +36,7 @@ int main()
     int num_lanes = LANE_SPEEDS.size();
     std::vector<int> ego_config = {SPEED_LIMIT, num_lanes, goal_s, goal_lane, MAX_ACCEL};
      
-    road.AddEgo(1,0, ego_config);
+    road.AddEgo(0,0, ego_config);
     int time_step = 0;
     
     while (road.GetEgo().s_ <= GOAL[0])
