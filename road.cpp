@@ -43,7 +43,7 @@ void Road::PopulateTraffic()
             {
                 
                 Vehicle vehicle = Vehicle(l,s,lane_speed,0);
-                vehicle.state = "CS";
+                vehicle.state_ = "CS";
                 this->vehicles_added += 1;
                 this->vehicles.insert(std::pair<int,Vehicle>(vehicles_added,vehicle));
                 vehicle_just_added = true;
@@ -81,8 +81,8 @@ void Road::Advance()
 void Road::Display(int time_step)
 {
     Vehicle ego = this->vehicles.find(this->ego_key)->second;
-    int s = ego.s;
-    std::string state = ego.state;
+    int s = ego.s_;
+    std::string state = ego.state_;
 
     this->camera_center = std::max(s, this->update_width / 2);
     int s_min = std::max(this->camera_center - this->update_width / 2, 0);
@@ -107,7 +107,7 @@ void Road::Display(int time_step)
         int v_id = it->first;
         Vehicle v = it->second;
 
-        if(s_min <= v.s && v.s < s_max)
+        if(s_min <= v.s_ && v.s_ < s_max)
         {
             std::string marker = "";
             if(v_id == this->ego_key)
@@ -129,7 +129,7 @@ void Road::Display(int time_step)
                 buffer << oss.str() << " ";
                 marker = buffer.str();
             }
-            road[int(v.s - s_min)][int(v.lane)] = marker;
+            road[int(v.s_ - s_min)][int(v.lane_)] = marker;
         }
         ++it;
     }
@@ -174,7 +174,7 @@ void Road::AddEgo(int lane_num, int s, std::vector<int> config_data)
     {
         int v_id = it->first;
         Vehicle v = it->second;
-        if(v.lane == lane_num && v.s == s)
+        if(v.lane_ == lane_num && v.s_ == s)
         {
             this->vehicles.erase(v_id);
         }
@@ -182,7 +182,7 @@ void Road::AddEgo(int lane_num, int s, std::vector<int> config_data)
     }
     Vehicle ego = Vehicle(lane_num, s, this->lane_speeds[lane_num], 0);
     ego.Configure(config_data);
-    ego.state = "KL";
+    ego.state_ = "KL";
     this->vehicles.insert(std::pair<int,Vehicle>(ego_key,ego));
     
 }
@@ -190,7 +190,7 @@ void Road::AddEgo(int lane_num, int s, std::vector<int> config_data)
 void Road::Cull()
 {
     Vehicle ego = this->vehicles.find(this->ego_key)->second;
-    int center_s = ego.s;
+    int center_s = ego.s_;
     std::set<std::vector<int>> claimed;
 
     auto it = this->vehicles.begin();
@@ -198,7 +198,7 @@ void Road::Cull()
     {
         int v_id = it->first;
         Vehicle v = it->second;
-        std::vector<int> claim_pair = {v.lane,v.s};
+        std::vector<int> claim_pair = {v.lane_, v.s_};
         claimed.insert(claim_pair);
         ++it;
     }
@@ -207,10 +207,10 @@ void Road::Cull()
     {
         int v_id = it->first;
         Vehicle v = it->second;
-        if( (v.s > (center_s + this->update_width / 2) ) || (v.s < (center_s - this->update_width / 2) ) )
+        if( (v.s_ > (center_s + this->update_width / 2) ) || (v.s_ < (center_s - this->update_width / 2) ) )
         {
             try {
-                claimed.erase({v.lane,v.s});
+                claimed.erase({v.lane_, v.s_});
             }
             catch (const std::exception& e) {
                 continue;

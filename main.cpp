@@ -39,7 +39,7 @@ int main()
     road.AddEgo(1,0, ego_config);
     int time_step = 0;
     
-    while (road.GetEgo().s <= GOAL[0])
+    while (road.GetEgo().s_ <= GOAL[0])
     {
         ++time_step;
         if (time_step > 150)
@@ -53,13 +53,13 @@ int main()
     }
 
     Vehicle ego = road.GetEgo();
-    if (ego.lane == GOAL[1])
+    if (ego.lane_ == GOAL[1])
     {
         std::cout << "You got to the goal in " << time_step << " seconds!" << std::endl;
     }
     else
     {
-        std::cout << "You missed the goal. You are in lane " << ego.lane << " instead of " << GOAL[1] << std::endl;
+        std::cout << "You missed the goal. You are in lane " << ego.lane_ << " instead of " << GOAL[1] << std::endl;
     }
 
     return 0;

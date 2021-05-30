@@ -31,17 +31,17 @@ public:
   };
 
   int L = 1;
-  int preferred_buffer = 6; // impacts "keep lane" behavior.
-  int lane;
-  int s;
-  int v;
-  int a;
-  int target_speed;
-  int lanes_available;
-  int max_acceleration;
-  int goal_lane;
-  int goal_s;
-  std::string state;
+  int preferred_buffer_ = 6; // impacts "keep lane" behavior.
+  int lane_;
+  int s_;
+  int v_;
+  int a_;
+  int target_speed_;
+  int lanes_available_;
+  int max_acceleration_;
+  int goal_lane_;
+  int goal_s_;
+  std::string state_;
 
   /**
   * Constructor
@@ -87,7 +87,7 @@ public:
 
   void RestoreStateFromSnapshot(Vehicle::Snapshot &snapshot);
 
-  Vehicle::Snapshot snapshot();
+  Vehicle::Snapshot GetSnapshot();
 };
 
 #endif

@@ -12,29 +12,29 @@
  * Initializes Vehicle
  */
 Vehicle::Vehicle(int lane, int s, int v, int a) {
-    this->lane = lane;
-    this->s = s;
-    this->v = v;
-    this->a = a;
-    this->state = "CS";
-    this->max_acceleration = -1;
+    this->lane_ = lane;
+    this->s_ = s;
+    this->v_ = v;
+    this->a_ = a;
+    this->state_ = "CS";
+    this->max_acceleration_ = -1;
 }
 
 Vehicle::~Vehicle() {}
 
 void Vehicle::UpdateState(std::map<int, std::vector<std::vector<int>>> &predictions) {
-    this->state = this->GetNextState(predictions);
+    this->state_ = this->GetNextState(predictions);
 }
 
 std::string Vehicle::GetNextState(std::map<int,std::vector<std::vector<int>>> predictions){
     std::vector<std::string> states = {"KL", "LCL", "LCR"};
 
-    if (this->lane == 0){
+    if (this->lane_ == 0){
         auto result = find(states.begin(), states.end(), "LCL");
         states.erase(result);
     }
 
-    if (this->lane == (this->lanes_available - 1)){
+    if (this->lane_ == (this->lanes_available_ - 1)){
         auto result = find(states.begin(), states.end(), "LCR");
         states.erase(result);
     }
@@ -55,24 +55,27 @@ std::string Vehicle::GetNextState(std::map<int,std::vector<std::vector<int>>> pr
     return states.at(min_index);
 }
 
-std::vector<Vehicle::Snapshot> Vehicle::TrajectoryForState(std::string state, std::map<int,std::vector<std::vector<int>>> predictions, int horizon)
+std::vector<Vehicle::Snapshot> Vehicle::TrajectoryForState(std::string st, std::map<int, std::vector<std::vector<int>>> predictions, int horizon)
 {
-    Vehicle::Snapshot snap = this->snapshot();
+    Vehicle::Snapshot snap = this->GetSnapshot();
     std::vector<Vehicle::Snapshot> trajectory;
     trajectory.push_back(snap);
 
-    this->state = state;
+    this->state_ = st;
 
-    for(int i = 0; i < horizon; ++i){
+    for (int i = 0; i < horizon; ++i)
+    {
         this->RestoreStateFromSnapshot(snap);
-        this->state = state;
+        this->state_ = st;
         this->RealizeState(predictions);
         this->Increment(1);
-        trajectory.push_back(this->snapshot());
+        trajectory.push_back(this->GetSnapshot());
         
         // need to remove first prediction for each vehicle
-        for(auto &map : predictions){
-            for(auto vehicle : map.second){
+        for(auto &map : predictions)
+        {
+            for(auto vehicle : map.second)
+            {
                 vehicle.erase(vehicle.begin());
             }
         }
@@ -85,50 +88,56 @@ std::vector<Vehicle::Snapshot> Vehicle::TrajectoryForState(std::string state, st
 }
 
 void Vehicle::RestoreStateFromSnapshot(Vehicle::Snapshot &snap){
-    this->lane = snap.lane;
-    this->s = snap.s;
-    this->v = snap.v;
-    this->a = snap.a;
-    this->state = snap.state;
+    this->lane_ = snap.lane;
+    this->s_ = snap.s;
+    this->v_ = snap.v;
+    this->a_ = snap.a;
+    this->state_ = snap.state;
 }
 
-Vehicle::Snapshot Vehicle::snapshot()
+Vehicle::Snapshot Vehicle::GetSnapshot()
 {
-    Vehicle::Snapshot snapshot = {this->lane, this->s, this->v, this->a, this->state};
+    Vehicle::Snapshot snapshot = {
+            this->lane_,
+            this->s_,
+            this->v_,
+            this->a_,
+            this->state_
+    };
     return snapshot;
 }
 
 void Vehicle::Configure(std::vector<int> road_data)
 {
-    target_speed = road_data[0];
-    lanes_available = road_data[1];
-    max_acceleration = road_data[2];
-    goal_lane = road_data[3];
-    goal_s = road_data[4];
+    this->target_speed_ = road_data[0];
+    this->lanes_available_ = road_data[1];
+    this->max_acceleration_ = road_data[2];
+    this->goal_lane_ = road_data[3];
+    this->goal_s_ = road_data[4];
 }
 
 std::string Vehicle::Display()
 {
     std::ostringstream oss;
-    oss << "s:    " << this->s << "\n";
-    oss << "lane: " << this->lane << "\n";
-    oss << "v:    " << this->v << "\n";
-    oss << "a:    " << this->a << "\n";
+    oss << "s:    " << this->s_ << "\n";
+    oss << "lane: " << this->lane_ << "\n";
+    oss << "v:    " << this->v_ << "\n";
+    oss << "a:    " << this->a_ << "\n";
     return oss.str();
 }
 
 void Vehicle::Increment(int dt = 1)
 {
-    this->s += this->v * dt;
-    this->v += this->a * dt;
+    this->s_ += this->v_ * dt;
+    this->v_ += this->a_ * dt;
 }
 
 std::vector<int> Vehicle::StateAt(int t)
 {
     // Predicts state of vehicle in t seconds (assuming constant acceleration)
-    int s = this->s + this->v * t + this->a * t * t / 2;
-    int v = this->v + this->a * t;
-    return {this->lane, s, v, this->a};
+    int s = this->s_ + this->v_ * t + this->a_ * t * t / 2;
+    int v = this->v_ + this->a_ * t;
+    return {this->lane_, s, v, this->a_};
 }
 
 bool Vehicle::CollidesWith(Vehicle other, int at_time)
@@ -136,7 +145,7 @@ bool Vehicle::CollidesWith(Vehicle other, int at_time)
     // Simple collision detection.
     std::vector<int> check1 = StateAt(at_time);
     std::vector<int> check2 = other.StateAt(at_time);
-    return (check1[0] == check2[0]) && (abs(check1[1]-check2[1]) <= L);
+    return (check1[0] == check2[0]) && (abs(check1[1] - check2[1]) <= L);
 }
 
 Vehicle::Collider Vehicle::WillCollideWith(Vehicle other, int time_steps)
@@ -161,7 +170,7 @@ void Vehicle::RealizeState(std::map<int,std::vector<std::vector<int>>> predictio
 {
     // Given a state, realize it by adjusting acceleration and lane.
     // Note - lane changes happen instantaneously.
-    std::string state = this->state;
+    std::string state = this->state_;
     if(state == "CS")
     {
         RealizeConstantSpeed();
@@ -182,13 +191,13 @@ void Vehicle::RealizeState(std::map<int,std::vector<std::vector<int>>> predictio
 
 void Vehicle::RealizeConstantSpeed()
 {
-    a = 0;
+    this->a_ = 0;
 }
 
-int Vehicle::MaxAccelForLane(std::map<int,std::vector<std::vector<int>>> predictions, int lane, int s)
+int Vehicle::MaxAccelForLane(std::map<int, std::vector<std::vector<int>>> predictions, int lane, int s)
 {
-    int delta_v_til_target = target_speed - v;
-    int max_acc = std::min(max_acceleration, delta_v_til_target);
+    int delta_v_til_target = this->target_speed_ - this->v_;
+    int max_acc = std::min(this->max_acceleration_, delta_v_til_target);
 
     auto it = predictions.begin();
     std::vector<std::vector<std::vector<int>>> in_front;
@@ -216,9 +225,9 @@ int Vehicle::MaxAccelForLane(std::map<int,std::vector<std::vector<int>>> predict
         }
         
         int next_pos = leading[1][1];
-        int my_next = s + this->v;
+        int my_next = s + this->v_;
         int separation_next = next_pos - my_next;
-        int available_room = separation_next - preferred_buffer;
+        int available_room = separation_next - this->preferred_buffer_;
         max_acc = std::min(max_acc, available_room);
     }
     return max_acc;
@@ -226,7 +235,7 @@ int Vehicle::MaxAccelForLane(std::map<int,std::vector<std::vector<int>>> predict
 
 void Vehicle::RealizeKeepLane(std::map<int,std::vector< std::vector<int>>> predictions)
 {
-    this->a = MaxAccelForLane(predictions, this->lane, this->s);
+    this->a_ = MaxAccelForLane(predictions, this->lane_, this->s_);
 }
 
 void Vehicle::RealizeLaneChange(std::map<int,std::vector< std::vector<int>>> predictions, std::string direction)
@@ -236,10 +245,8 @@ void Vehicle::RealizeLaneChange(std::map<int,std::vector< std::vector<int>>> pre
     {
         delta = 1;
     }
-    this->lane += delta;
-    int lane = this->lane;
-    int s = this->s;
-    this->a = MaxAccelForLane(predictions, lane, s);
+    this->lane_ += delta;
+    this->a_ = MaxAccelForLane(predictions, this->lane_, this->s_);
 }
 
 void Vehicle::RealizePrepLaneChange(std::map<int, std::vector<std::vector<int>>> predictions, std::string direction)
@@ -250,13 +257,13 @@ void Vehicle::RealizePrepLaneChange(std::map<int, std::vector<std::vector<int>>>
         delta = 1;
     }
 
-    int lane = this->lane + delta;
+    int lane = this->lane_ + delta;
     auto it = predictions.begin();
     std::vector<std::vector<std::vector<int>>> at_behind;
     while(it != predictions.end())
     {
         std::vector<std::vector<int>> v = it->second;
-        if((v[0][0] == lane) && (v[0][1] <= this->s))
+        if((v[0][0] == lane) && (v[0][1] <= this->s_))
         {
             at_behind.push_back(v);
 
@@ -277,34 +284,36 @@ void Vehicle::RealizePrepLaneChange(std::map<int, std::vector<std::vector<int>>>
             }
         }
         int target_vel = nearest_behind[1][1] - nearest_behind[0][1];
-        int delta_v = this->v - target_vel;
-        int delta_s = this->s - nearest_behind[0][1];
+        int delta_v = this->v_ - target_vel;
+        int delta_s = this->s_ - nearest_behind[0][1];
         if(delta_v != 0)
         {
             int time = -2 * delta_s / delta_v;
             int a;
             if (time == 0)
             {
-                a = this->a;
+                a = this->a_;
             }
             else
             {
                 a = delta_v/time;
             }
-            if(a > this->max_acceleration)
+
+            if(a > this->max_acceleration_)
             {
-                a = this->max_acceleration;
+                a = this->max_acceleration_;
             }
-            if(a < -this->max_acceleration)
+
+            if(a < -this->max_acceleration_)
             {
-                a = -this->max_acceleration;
+                a = -this->max_acceleration_;
             }
-            this->a = a;
+            this->a_ = a;
         }
         else
         {
-            int my_min_acc = std::max(-this->max_acceleration,-delta_s);
-            this->a = my_min_acc;
+            int my_min_acc = std::max(-this->max_acceleration_, -delta_s);
+            this->a_ = my_min_acc;
         }
     }
 }

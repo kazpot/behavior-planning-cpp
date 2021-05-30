@@ -45,7 +45,7 @@ double Costfunction::DistanceFromGoalLane(Costfunction::TrajectoryData &data)
 double Costfunction::InefficiencyCost(Vehicle &vehicle, Costfunction::TrajectoryData &data)
 {
     int speed = data.avg_speed;
-    int target_speed = vehicle.target_speed;
+    int target_speed = vehicle.target_speed_;
     int diff = target_speed - speed;
     double pct = double(diff) / target_speed;
     double multiplier = pow(pct, 2);
@@ -72,12 +72,12 @@ double Costfunction::BufferCost(Costfunction::TrajectoryData &data)
         return 10 * DANGER;
     }
 
-    int timesteps_away = closest / data.avg_speed;
-    if (timesteps_away > DESIRED_BUFFER)
+    int time_steps_away = closest / data.avg_speed;
+    if (time_steps_away > DESIRED_BUFFER)
     {
         return 0.0;
     }
-    double multiplier = 1.0 - pow(timesteps_away / DESIRED_BUFFER, 2);
+    double multiplier = 1.0 - pow(time_steps_away / DESIRED_BUFFER, 2);
     return multiplier * DANGER;
 }
 
@@ -87,7 +87,6 @@ double Costfunction::CalculateCost(Vehicle &vehicle, std::vector<Vehicle::Snapsh
     trajectory_data = this->GetHelperData(vehicle, trajectory, predictions);
 
     double cost = 0.0;
-
     cost += this->DistanceFromGoalLane(trajectory_data);
     cost += this->InefficiencyCost(vehicle, trajectory_data);
     cost += this->CollisionCost(trajectory_data);
@@ -103,8 +102,8 @@ Costfunction::TrajectoryData Costfunction::GetHelperData(Vehicle &vehicle, std::
     Vehicle::Snapshot current_snapshot = t.front();
     Vehicle::Snapshot first = t.at(1);
     Vehicle::Snapshot last = t.back();
-    int end_distance_to_goal = vehicle.goal_s - last.s;
-    int end_lanes_from_goal = abs(vehicle.goal_lane - last.lane);
+    int end_distance_to_goal = vehicle.goal_s_ - last.s;
+    int end_lanes_from_goal = abs(vehicle.goal_lane_ - last.lane);
     auto dt = (double)trajectory.size();
     int proposed_lane = first.lane;
     auto avg_speed = (double)((last.s - current_snapshot.s) / dt);

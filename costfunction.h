@@ -14,16 +14,15 @@
 
 
 // priority levels for costs
+// collision > danger > reach goal > comfort > efficiency
 const double COLLISION  = pow(10,6);
 const double DANGER     = pow(10,5);
 const double REACH_GOAL = pow(10,5);
 const double COMFORT    = pow(10,4);
 const double EFFICIENCY = pow(10,2);
 
-const double DESIRED_BUFFER = 1.5; // timesteps
+const double DESIRED_BUFFER = 1.5;
 const int PLANNING_HORIZON = 2;
-
-const bool DEBUG = false;
 
 class Costfunction{
 public:
@@ -64,8 +63,6 @@ public:
     Costfunction::TrajectoryData GetHelperData(Vehicle &vehicle, std::vector<Vehicle::Snapshot> trajectory, std::map<int,std::vector<std::vector<int>>> &predictions);
 
     bool CheckCollision(Vehicle::Snapshot snapshot, double s_previous, double s_now);
-
-    std::vector<double>UnpackSnapshot(Vehicle::Snapshot snapshot);
 
     std::map<int,std::vector<std::vector<int>>> FilterPredictionsByLane(std::map<int,std::vector<std::vector<int>>> predictions, int lane);
 };
