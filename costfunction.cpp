@@ -12,18 +12,17 @@ Costfunction::Costfunction() {}
 
 Costfunction::~Costfunction() {}
 
-
-double Costfunction::ChangeLaneCost(Vehicle vehicle, std::vector<Vehicle::Snapshot> trajectory, std::map<int,std::vector<std::vector<int>>> predictions, Costfunction::TrajectoryData data)
+double Costfunction::ChangeLaneCost(std::vector<Vehicle::Snapshot> trajectory, Costfunction::TrajectoryData data)
 {
     // Penalizes lane changes AWAY from the goal lane and rewards
     // lane changes TOWARDS the goal lane.
     int proposed_lanes = data.end_lanes_from_goal;
-    int cur_lanes = trajectory[0].lane;
+    int cur_lane = trajectory[0].lane;
     double cost = 0;
-    if (proposed_lanes > cur_lanes){
+    if (proposed_lanes > cur_lane){
         cost = COMFORT;
     }
-    if (proposed_lanes < cur_lanes){
+    if (proposed_lanes < cur_lane){
         cost = -1.0 * COMFORT;
     }
     if (cost != 0){
@@ -32,7 +31,7 @@ double Costfunction::ChangeLaneCost(Vehicle vehicle, std::vector<Vehicle::Snapsh
     return cost;
 }
 
-double Costfunction::DistanceFromGoalLane(Vehicle vehicle, std::vector<Vehicle::Snapshot> trajectory, std::map<int,std::vector<std::vector<int>>> predictions, Costfunction::TrajectoryData data)
+double Costfunction::DistanceFromGoalLane(Costfunction::TrajectoryData &data)
 {
     int distance = abs(data.end_distance_to_goal);
     distance = std::max(distance, 1);
@@ -43,7 +42,7 @@ double Costfunction::DistanceFromGoalLane(Vehicle vehicle, std::vector<Vehicle::
     return cost;
 }
 
-double Costfunction::InefficiencyCost(Vehicle vehicle, std::vector<Vehicle::Snapshot> trajectory, std::map<int,std::vector<std::vector<int>>> predictions, Costfunction::TrajectoryData data)
+double Costfunction::InefficiencyCost(Vehicle &vehicle, Costfunction::TrajectoryData &data)
 {
     int speed = data.avg_speed;
     int target_speed = vehicle.target_speed;
@@ -54,7 +53,7 @@ double Costfunction::InefficiencyCost(Vehicle vehicle, std::vector<Vehicle::Snap
 }
 
 
-double Costfunction::CollisionCost(Vehicle vehicle, std::vector<Vehicle::Snapshot> trajectory, std::map<int,std::vector<std::vector<int>>> predictions, Costfunction::TrajectoryData data)
+double Costfunction::CollisionCost(Costfunction::TrajectoryData &data)
 {
     if (data.collides.size() > 0){
         int time_til_collision = data.collides["at"];
@@ -65,7 +64,7 @@ double Costfunction::CollisionCost(Vehicle vehicle, std::vector<Vehicle::Snapsho
     return 0.0;
 }
 
-double Costfunction::BufferCost(Vehicle vehicle, std::vector<Vehicle::Snapshot> trajectory, std::map<int,std::vector<std::vector<int>>> predictions, Costfunction::TrajectoryData data)
+double Costfunction::BufferCost(Costfunction::TrajectoryData &data)
 {
     int closest = data.closest_approach;
     if (closest == 0)
@@ -82,23 +81,23 @@ double Costfunction::BufferCost(Vehicle vehicle, std::vector<Vehicle::Snapshot> 
     return multiplier * DANGER;
 }
 
-double Costfunction::CalculateCost(Vehicle& vehicle, std::vector<Vehicle::Snapshot> trajectory, std::map<int,std::vector<std::vector<int>>> predictions, bool verbose=false)
+double Costfunction::CalculateCost(Vehicle &vehicle, std::vector<Vehicle::Snapshot> trajectory, std::map<int,std::vector<std::vector<int>>> predictions, bool verbose=false)
 {
     TrajectoryData trajectory_data = TrajectoryData();
     trajectory_data = this->GetHelperData(vehicle, trajectory, predictions);
 
     double cost = 0.0;
 
-    cost += this->DistanceFromGoalLane(vehicle, trajectory, predictions, trajectory_data);
-    cost += this->InefficiencyCost(vehicle, trajectory, predictions, trajectory_data);
-    cost += this->CollisionCost(vehicle, trajectory, predictions, trajectory_data);
-    cost += this->BufferCost(vehicle, trajectory, predictions, trajectory_data);
-    cost += this->ChangeLaneCost(vehicle, trajectory, predictions, trajectory_data);
+    cost += this->DistanceFromGoalLane(trajectory_data);
+    cost += this->InefficiencyCost(vehicle, trajectory_data);
+    cost += this->CollisionCost(trajectory_data);
+    cost += this->BufferCost(trajectory_data);
+    cost += this->ChangeLaneCost(trajectory, trajectory_data);
 
     return cost;
 }
 
-Costfunction::TrajectoryData Costfunction::GetHelperData(Vehicle vehicle, std::vector<Vehicle::Snapshot> trajectory, std::map<int,std::vector<std::vector<int>>> predictions)
+Costfunction::TrajectoryData Costfunction::GetHelperData(Vehicle &vehicle, std::vector<Vehicle::Snapshot> trajectory, std::map<int,std::vector<std::vector<int>>> &predictions)
 {
     std::vector<Vehicle::Snapshot> t = trajectory;
     Vehicle::Snapshot current_snapshot = t.front();
@@ -119,10 +118,10 @@ Costfunction::TrajectoryData Costfunction::GetHelperData(Vehicle vehicle, std::v
 
     for(int i = 1; i < PLANNING_HORIZON + 1; ++i){
         Vehicle::Snapshot ss = trajectory.at(i);
+
         int s = ss.s;
         int a = ss.a;
         accels.push_back(a);
-
         for (auto &item : filtered)
         {
             std::vector<std::vector<int>> v = item.second;
@@ -151,9 +150,9 @@ Costfunction::TrajectoryData Costfunction::GetHelperData(Vehicle vehicle, std::v
         rms_accels.push_back(rms);
     }
 
-    double sum = (double)accumulate(rms_accels.begin(), rms_accels.end(), 0);
+    double sum = (double)std::accumulate(rms_accels.begin(), rms_accels.end(), 0);
     int num_accels = rms_accels.size();
-    double rms_acceleration = (double)sum/num_accels;
+    auto rms_acceleration = (double)(sum / num_accels);
 
     TrajectoryData trajectory_data = TrajectoryData();
     trajectory_data.proposed_lane = proposed_lane;
