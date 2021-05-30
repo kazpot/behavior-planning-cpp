@@ -117,9 +117,8 @@ Costfunction::TrajectoryData Costfunction::GetHelperData(Vehicle &vehicle, std::
     std::map<std::string, int> collides;
     std::vector<int> accels;
     int closest_approach = 999999;
-    Vehicle::Snapshot last_snap = trajectory.front();
-    std::map<int,std::vector<std::vector<int>>> filtered = this->FilterPredictionsByLane(predictions, proposed_lane);
 
+    std::map<int, std::vector<std::vector<int>>> filtered = this->FilterPredictionsByLane(predictions, proposed_lane);
     for (int i = 1; i < PLANNING_HORIZON + 1; ++i)
     {
         Vehicle::Snapshot ss = trajectory.at(i);
@@ -145,7 +144,6 @@ Costfunction::TrajectoryData Costfunction::GetHelperData(Vehicle &vehicle, std::
                 closest_approach = dist;
             }
         }
-        last_snap = ss;
     }
     int max_accel = *max_element(accels.begin(), accels.end());
     
@@ -204,13 +202,12 @@ bool Costfunction::CheckCollision(Vehicle::Snapshot snapshot, double s_previous,
     return false;
 }
 
-std::map<int, std::vector<std::vector<int>>> Costfunction::FilterPredictionsByLane(std::map<int, std::vector<std::vector<int>>> predictions)
+std::map<int, std::vector<std::vector<int>>> Costfunction::FilterPredictionsByLane(std::map<int, std::vector<std::vector<int>>> predictions, int lane)
 {
     std::map<int, std::vector<std::vector<int>>> filtered;
     for (auto &map : predictions)
     {
         int v_id = map.first;
-        // skip ego
         if (v_id != -1)
         {
             filtered[v_id] = map.second;

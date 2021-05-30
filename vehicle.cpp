@@ -323,12 +323,14 @@ std::vector<std::vector<int>> Vehicle::GeneratePredictions(int horizon = 10)
     std::vector<std::vector<int>> predictions;
     for( int i = 0; i < horizon; ++i)
     {
-      std::vector<int> check1 = StateAt(i);
+        std::vector<int> pos = StateAt(i);
 
-      // Predicts s position until 9 time_step ahead
-      // lane_s = {lane, s}
-      std::vector<int> lane_s = {check1[0], check1[1]};
-      predictions.push_back(lane_s);
+        // Predicts s position until 9 time_step ahead
+        // lane_s = {lane, s}
+        int lane = pos[0];
+        int s = pos[1];
+        std::vector<int> lane_s = {lane, s};
+        predictions.push_back(lane_s);
     }
     return predictions;
 }
