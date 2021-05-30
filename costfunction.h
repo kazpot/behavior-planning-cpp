@@ -64,7 +64,7 @@ public:
 
     bool CheckCollision(Vehicle::Snapshot snapshot, double s_previous, double s_now);
 
-    std::map<int,std::vector<std::vector<int>>> FilterPredictionsByLane(std::map<int,std::vector<std::vector<int>>> predictions, int lane);
+    std::map<int,std::vector<std::vector<int>>> FilterPredictionsByLane(std::map<int,std::vector<std::vector<int>>> predictions);
 };
 
 #endif

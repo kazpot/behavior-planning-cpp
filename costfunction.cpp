@@ -18,16 +18,20 @@ double Costfunction::ChangeLaneCost(std::vector<Vehicle::Snapshot> trajectory, C
     // lane changes TOWARDS the goal lane.
     int proposed_lanes = data.end_lanes_from_goal;
     int cur_lane = trajectory[0].lane;
+
     double cost = 0;
     if (proposed_lanes > cur_lane){
         cost = COMFORT;
     }
+
     if (proposed_lanes < cur_lane){
         cost = -1.0 * COMFORT;
     }
+
     if (cost != 0){
         std::cout << "!!cost for lane change is " << cost << "\n\n";
     }
+
     return cost;
 }
 
@@ -55,7 +59,8 @@ double Costfunction::InefficiencyCost(Vehicle &vehicle, Costfunction::Trajectory
 
 double Costfunction::CollisionCost(Costfunction::TrajectoryData &data)
 {
-    if (data.collides.size() > 0){
+    if (data.collides.size() > 0)
+    {
         int time_til_collision = data.collides["at"];
         double exponent = (double)pow(time_til_collision,2);
         double multiplier = exp(-1 * exponent);
@@ -115,7 +120,8 @@ Costfunction::TrajectoryData Costfunction::GetHelperData(Vehicle &vehicle, std::
     Vehicle::Snapshot last_snap = trajectory.front();
     std::map<int,std::vector<std::vector<int>>> filtered = this->FilterPredictionsByLane(predictions, proposed_lane);
 
-    for(int i = 1; i < PLANNING_HORIZON + 1; ++i){
+    for (int i = 1; i < PLANNING_HORIZON + 1; ++i)
+    {
         Vehicle::Snapshot ss = trajectory.at(i);
 
         int s = ss.s;
@@ -144,7 +150,8 @@ Costfunction::TrajectoryData Costfunction::GetHelperData(Vehicle &vehicle, std::
     int max_accel = *max_element(accels.begin(), accels.end());
     
     std::vector<int> rms_accels;
-    for(int a : accels){
+    for (int a : accels)
+    {
         int rms = (int)pow(a, 2);
         rms_accels.push_back(rms);
     }
@@ -197,11 +204,13 @@ bool Costfunction::CheckCollision(Vehicle::Snapshot snapshot, double s_previous,
     return false;
 }
 
-std::map<int,std::vector<std::vector<int>>> Costfunction::FilterPredictionsByLane(std::map<int, std::vector<std::vector<int>>> predictions, int lane)
+std::map<int, std::vector<std::vector<int>>> Costfunction::FilterPredictionsByLane(std::map<int, std::vector<std::vector<int>>> predictions)
 {
-    std::map<int,std::vector<std::vector<int>>> filtered;
-    for(auto &map : predictions){
+    std::map<int, std::vector<std::vector<int>>> filtered;
+    for (auto &map : predictions)
+    {
         int v_id = map.first;
+        // skip ego
         if (v_id != -1)
         {
             filtered[v_id] = map.second;
