@@ -98,7 +98,6 @@ void Road::Display(int time_step)
             road_lane.push_back("     ");
         }
         road.push_back(road_lane);
-
     }
 
     auto it = this->vehicles.begin();

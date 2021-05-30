@@ -24,7 +24,6 @@ const double DESIRED_BUFFER = 1.5; // timesteps
 const int PLANNING_HORIZON = 2;
 
 const bool DEBUG = false;
-// const bool DEBUG = true;
 
 class Costfunction{
 public:
