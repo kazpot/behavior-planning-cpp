@@ -57,12 +57,12 @@ double Costfunction::InefficiencyCost(Vehicle &vehicle, Costfunction::Trajectory
 }
 
 
-double Costfunction::CollisionCost(Costfunction::TrajectoryData &data)
+double Costfunction::CollisionCost(Costfunction::TrajectoryData &trajectory_data)
 {
-    if (data.collides.size() > 0)
+    if (!trajectory_data.collides.empty())
     {
-        int time_til_collision = data.collides["at"];
-        double exponent = (double)pow(time_til_collision,2);
+        int time_til_collision = trajectory_data.collides["at"];
+        auto exponent = (double)pow(time_til_collision,2);
         double multiplier = exp(-1 * exponent);
         return multiplier * COLLISION;
     }
@@ -175,27 +175,40 @@ bool Costfunction::CheckCollision(Vehicle::Snapshot snapshot, double s_previous,
 {
     int s = snapshot.s;
     int v = snapshot.v;
-    int v_target = s_now - s_previous;
-    if(s_previous < s){
-        if(s_now >= s){
+
+    if (s_previous < s)
+    {
+        if (s_now >= s)
+        {
             return true;
-        }else{
+        }
+        else
+        {
             return false;
         }
     }
     
-    if(s_previous > s){
-        if(s_now <= s){
+    if (s_previous > s)
+    {
+        if (s_now <= s)
+        {
             return true;
-        }else{
+        }
+        else
+        {
             return false;
         }
     }
 
-    if(s_previous == s){
-        if(v_target > v){
+    int v_target = (int)(s_now - s_previous);
+    if (s_previous == s)
+    {
+        if (v_target > v)
+        {
             return false;
-        }else{
+        }
+        else
+        {
             return true;
         }
     }
