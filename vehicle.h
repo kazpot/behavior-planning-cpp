@@ -83,9 +83,9 @@ public:
 
   std::string GetNextState(std::map<int,std::vector<std::vector<int>>> predictions);
 
-  std::vector<Vehicle::Snapshot> TrajectoryForState(std::string state, std::map<int,std::vector<std::vector<int>>> predictions, int horizon=5);
+  std::vector<Vehicle::Snapshot> TrajectoryForState(std::string state, std::map<int,std::vector<std::vector<int>>> predictions, int horizon = 5);
 
-  void RestoreStateFromSnapshot(Vehicle::Snapshot);
+  void RestoreStateFromSnapshot(Vehicle::Snapshot &snapshot);
 
   Vehicle::Snapshot snapshot();
 };

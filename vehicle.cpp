@@ -28,6 +28,7 @@ void Vehicle::UpdateState(std::map<int, std::vector<std::vector<int>>> &predicti
 
 std::string Vehicle::GetNextState(std::map<int,std::vector<std::vector<int>>> predictions){
     std::vector<std::string> states = {"KL", "LCL", "LCR"};
+
     if (this->lane == 0){
         auto result = find(states.begin(), states.end(), "LCL");
         states.erase(result);
@@ -40,12 +41,12 @@ std::string Vehicle::GetNextState(std::map<int,std::vector<std::vector<int>>> pr
 
     double min_cost = std::numeric_limits<double>::infinity();
     int min_index = 0;
-    Costfunction costf = Costfunction();
+    Costfunction cost_function = Costfunction();
     for (int i = 0; i < states.size(); ++i){
         const std::map<int, std::vector<std::vector<int>>> &predictions_copy = predictions;
         std::string st = states.at(i);
         std::vector<Vehicle::Snapshot> trajectory = this->TrajectoryForState(st, predictions_copy);
-        double cost = costf.CalculateCost(*this, trajectory, predictions, false);
+        double cost = cost_function.CalculateCost(*this, trajectory, predictions, false);
         if(cost < min_cost){
             min_cost = cost;
             min_index = i;
@@ -54,7 +55,8 @@ std::string Vehicle::GetNextState(std::map<int,std::vector<std::vector<int>>> pr
     return states.at(min_index);
 }
 
-std::vector<Vehicle::Snapshot> Vehicle::TrajectoryForState(std::string state, std::map<int,std::vector<std::vector<int>>> predictions, int horizon){
+std::vector<Vehicle::Snapshot> Vehicle::TrajectoryForState(std::string state, std::map<int,std::vector<std::vector<int>>> predictions, int horizon)
+{
     Vehicle::Snapshot snap = this->snapshot();
     std::vector<Vehicle::Snapshot> trajectory;
     trajectory.push_back(snap);
@@ -68,10 +70,10 @@ std::vector<Vehicle::Snapshot> Vehicle::TrajectoryForState(std::string state, st
         this->Increment(1);
         trajectory.push_back(this->snapshot());
         
-        //need to remove first prediction for each vehicle
-        for(auto map : predictions){
-            for(auto v : map.second){
-                v.erase(v.begin());
+        // need to remove first prediction for each vehicle
+        for(auto &map : predictions){
+            for(auto vehicle : map.second){
+                vehicle.erase(vehicle.begin());
             }
         }
     }
@@ -82,7 +84,7 @@ std::vector<Vehicle::Snapshot> Vehicle::TrajectoryForState(std::string state, st
     return trajectory;
 }
 
-void Vehicle::RestoreStateFromSnapshot(Vehicle::Snapshot snap){
+void Vehicle::RestoreStateFromSnapshot(Vehicle::Snapshot &snap){
     this->lane = snap.lane;
     this->s = snap.s;
     this->v = snap.v;

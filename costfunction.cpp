@@ -114,28 +114,30 @@ Costfunction::TrajectoryData Costfunction::GetHelperData(Vehicle vehicle, std::v
     std::map<std::string, int> collides;
     std::vector<int> accels;
     int closest_approach = 999999;
-    bool is_collided = false;
     Vehicle::Snapshot last_snap = trajectory.front();
     std::map<int,std::vector<std::vector<int>>> filtered = this->FilterPredictionsByLane(predictions, proposed_lane);
 
     for(int i = 1; i < PLANNING_HORIZON + 1; ++i){
         Vehicle::Snapshot ss = trajectory.at(i);
-        int lane = ss.lane;
         int s = ss.s;
-        int v = ss.v;
         int a = ss.a;
         accels.push_back(a);
 
-        for(auto &item : filtered){
+        for (auto &item : filtered)
+        {
             std::vector<std::vector<int>> v = item.second;
             std::vector<int> state = v.at(i);
-            std::vector<int> last_state = v.at(i-1);
+            std::vector<int> last_state = v.at(i - 1);
+
             bool vehicle_collides = this->CheckCollision(ss, last_state.at(1), state.at(1));
-            if(vehicle_collides){
+            if (vehicle_collides)
+            {
                 collides["at"] = i;
             }
+
             int dist = abs(state.at(1) - s);
-            if(dist < closest_approach){
+            if (dist < closest_approach)
+            {
                 closest_approach = dist;
             }
         }
