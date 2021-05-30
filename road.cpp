@@ -74,10 +74,8 @@ void Road::Advance()
             it->second.RealizeState(predictions);
         }
         it->second.Increment(1);
-        
         ++it;
     }
-    
 }
 
 void Road::Display(int time_step)

@@ -1,7 +1,6 @@
 #include <iostream>
 #include "vehicle.h"
 #include "costfunction.h"
-#include <iostream>
 #include <cmath>
 #include <map>
 #include <string>
@@ -23,7 +22,7 @@ Vehicle::Vehicle(int lane, int s, int v, int a) {
 
 Vehicle::~Vehicle() {}
 
-void Vehicle::UpdateState(std::map<int, std::vector<std::vector<int>>>& predictions) {
+void Vehicle::UpdateState(std::map<int, std::vector<std::vector<int>>> &predictions) {
     this->state = this->GetNextState(predictions);
 }
 
@@ -33,6 +32,7 @@ std::string Vehicle::GetNextState(std::map<int,std::vector<std::vector<int>>> pr
         auto result = find(states.begin(), states.end(), "LCL");
         states.erase(result);
     }
+
     if (this->lane == (this->lanes_available - 1)){
         auto result = find(states.begin(), states.end(), "LCR");
         states.erase(result);
@@ -42,17 +42,16 @@ std::string Vehicle::GetNextState(std::map<int,std::vector<std::vector<int>>> pr
     int min_index = 0;
     Costfunction costf = Costfunction();
     for (int i = 0; i < states.size(); ++i){
-        std::map<int,std::vector<std::vector<int>>> predictions_copy = predictions;
-        std::string state = states.at(i);
-        std::vector<Vehicle::Snapshot> trajectory = this->TrajectoryForState(state,predictions_copy);
+        const std::map<int, std::vector<std::vector<int>>> &predictions_copy = predictions;
+        std::string st = states.at(i);
+        std::vector<Vehicle::Snapshot> trajectory = this->TrajectoryForState(st, predictions_copy);
         double cost = costf.CalculateCost(*this, trajectory, predictions, false);
         if(cost < min_cost){
             min_cost = cost;
             min_index = i;
         }
     }
-    std::string state = states.at(min_index);
-    return state;
+    return states.at(min_index);
 }
 
 std::vector<Vehicle::Snapshot> Vehicle::TrajectoryForState(std::string state, std::map<int,std::vector<std::vector<int>>> predictions, int horizon){
@@ -197,7 +196,6 @@ int Vehicle::MaxAccelForLane(std::map<int,std::vector<std::vector<int>>> predict
         if((v[0][0] == lane) && (v[0][1] > s))
         {
             in_front.push_back(v);
-
         }
         ++it;
     }
@@ -208,9 +206,9 @@ int Vehicle::MaxAccelForLane(std::map<int,std::vector<std::vector<int>>> predict
         std::vector<std::vector<int>> leading = {};
         for(auto &i : in_front)
         {
-            if((i[0][1]-s) < min_s)
+            if((i[0][1] - s) < min_s)
             {
-                min_s = (i[0][1] - s);
+                min_s = i[0][1] - s;
                 leading = i;
             }
         }
@@ -245,19 +243,17 @@ void Vehicle::RealizeLaneChange(std::map<int,std::vector< std::vector<int>>> pre
 void Vehicle::RealizePrepLaneChange(std::map<int, std::vector<std::vector<int>>> predictions, std::string direction)
 {
     int delta = -1;
-    if (direction.compare("L") == 0)
+    if (direction == "L")
     {
         delta = 1;
     }
-    int lane = this->lane + delta;
 
+    int lane = this->lane + delta;
     auto it = predictions.begin();
     std::vector<std::vector<std::vector<int>>> at_behind;
     while(it != predictions.end())
     {
-        int v_id = it->first;
         std::vector<std::vector<int>> v = it->second;
-
         if((v[0][0] == lane) && (v[0][1] <= this->s))
         {
             at_behind.push_back(v);
@@ -268,7 +264,6 @@ void Vehicle::RealizePrepLaneChange(std::map<int, std::vector<std::vector<int>>>
 
     if(!at_behind.empty())
     {
-
         int max_s = -1000;
         std::vector<std::vector<int>> nearest_behind = {};
         for(auto &i : at_behind)
@@ -284,8 +279,7 @@ void Vehicle::RealizePrepLaneChange(std::map<int, std::vector<std::vector<int>>>
         int delta_s = this->s - nearest_behind[0][1];
         if(delta_v != 0)
         {
-
-            int time = -2 * delta_s/delta_v;
+            int time = -2 * delta_s / delta_v;
             int a;
             if (time == 0)
             {
@@ -319,6 +313,9 @@ std::vector<std::vector<int>> Vehicle::GeneratePredictions(int horizon = 10)
     for( int i = 0; i < horizon; ++i)
     {
       std::vector<int> check1 = StateAt(i);
+
+      // Predicts s position until 9 time_step ahead
+      // lane_s = {lane, s}
       std::vector<int> lane_s = {check1[0], check1[1]};
       predictions.push_back(lane_s);
     }
