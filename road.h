@@ -15,7 +15,6 @@
 
 class Road {
 public:
-
     int update_width = 70;
     std::string ego_rep = " *** ";
     int ego_key = -1;
@@ -37,17 +36,17 @@ public:
     */
     virtual ~Road();
 
-    Vehicle get_ego();
+    Vehicle GetEgo();
 
-    void populate_traffic();
+    void PopulateTraffic();
 
-    void advance();
+    void Advance();
 
-    void display(int timestep);
+    void Display(int timestep);
 
-    void add_ego(int lane_num, int s, std::vector<int> config_data);
+    void AddEgo(int lane_num, int s, std::vector<int> config_data);
 
-    void cull();
+    void Cull();
 
 };
 

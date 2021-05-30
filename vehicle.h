@@ -53,39 +53,39 @@ public:
   */
   virtual ~Vehicle();
 
-  void update_state(std::map<int, std::vector<std::vector<int>>>& predictions);
+  void UpdateState(std::map<int, std::vector<std::vector<int>>>& predictions);
 
-  void configure(std::vector<int> road_data);
+  void Configure(std::vector<int> road_data);
 
-  std::string display();
+  std::string Display();
 
-  void increment(int dt);
+  void Increment(int dt);
 
-  std::vector<int> state_at(int t);
+  std::vector<int> StateAt(int t);
 
-  bool collides_with(Vehicle other, int at_time);
+  bool CollidesWith(Vehicle other, int at_time);
 
-  Collider will_collide_with(Vehicle other, int timesteps);
+  Collider WillCollideWith(Vehicle other, int timesteps);
 
-  void realize_state(std::map<int, std::vector<std::vector<int>>> predictions);
+  void RealizeState(std::map<int, std::vector<std::vector<int>>> predictions);
 
-  void realize_constant_speed();
+  void RealizeConstantSpeed();
 
-  int _max_accel_for_lane(std::map<int,std::vector<std::vector<int> > > predictions, int lane, int s);
+  int MaxAccelForLane(std::map<int,std::vector<std::vector<int> > > predictions, int lane, int s);
 
-  void realize_keep_lane(std::map<int, std::vector<std::vector<int> >> predictions);
+  void RealizeKeepLane(std::map<int, std::vector<std::vector<int> >> predictions);
 
-  void realize_lane_change(std::map<int,std::vector<std::vector<int>>> predictions, std::string direction);
+  void RealizeLaneChange(std::map<int,std::vector<std::vector<int>>> predictions, std::string direction);
 
-  void realize_prep_lane_change(std::map<int,std::vector<std::vector<int>>> predictions, std::string direction);
+  void RealizePrepLaneChange(std::map<int,std::vector<std::vector<int>>> predictions, std::string direction);
 
-  std::vector<std::vector<int> > generate_predictions(int horizon);
+  std::vector<std::vector<int> > GeneratePredictions(int horizon);
 
-  std::string get_next_state(std::map<int,std::vector<std::vector<int>>> predictions);
+  std::string GetNextState(std::map<int,std::vector<std::vector<int>>> predictions);
 
-  std::vector<Vehicle::Snapshot> trajectory_for_state(std::string state, std::map<int,std::vector<std::vector<int>>> predictions, int horizon=5);
+  std::vector<Vehicle::Snapshot> TrajectoryForState(std::string state, std::map<int,std::vector<std::vector<int>>> predictions, int horizon=5);
 
-  void restore_state_from_snapshot(Vehicle::Snapshot);
+  void RestoreStateFromSnapshot(Vehicle::Snapshot);
 
   Vehicle::Snapshot snapshot();
 };

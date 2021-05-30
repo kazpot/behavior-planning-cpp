@@ -50,25 +50,25 @@ public:
     */
     virtual ~Costfunction();
 
-    double change_lane_cost(Vehicle vehicle, std::vector<Vehicle::Snapshot> trajectory, std::map<int,std::vector<std::vector<int>>> predictions, Costfunction::TrajectoryData data);
+    double ChangeLaneCost(Vehicle vehicle, std::vector<Vehicle::Snapshot> trajectory, std::map<int,std::vector<std::vector<int>>> predictions, Costfunction::TrajectoryData data);
 
-    double distance_from_goal_lane(Vehicle vehicle, std::vector<Vehicle::Snapshot> trajectory, std::map<int,std::vector<std::vector<int>>> predictions, Costfunction::TrajectoryData data);
+    double DistanceFromGoalLane(Vehicle vehicle, std::vector<Vehicle::Snapshot> trajectory, std::map<int,std::vector<std::vector<int>>> predictions, Costfunction::TrajectoryData data);
 
-    double inefficiency_cost(Vehicle vehicle, std::vector<Vehicle::Snapshot> trajectory, std::map<int,std::vector<std::vector<int>>> predictions, Costfunction::TrajectoryData data);
+    double InefficiencyCost(Vehicle vehicle, std::vector<Vehicle::Snapshot> trajectory, std::map<int,std::vector<std::vector<int>>> predictions, Costfunction::TrajectoryData data);
 
-    double collision_cost(Vehicle vehicle, std::vector<Vehicle::Snapshot> trajectory, std::map<int,std::vector<std::vector<int>>> predictions, Costfunction::TrajectoryData data);
+    double CollisionCost(Vehicle vehicle, std::vector<Vehicle::Snapshot> trajectory, std::map<int,std::vector<std::vector<int>>> predictions, Costfunction::TrajectoryData data);
 
-    double buffer_cost(Vehicle vehicle, std::vector<Vehicle::Snapshot> trajectory, std::map<int,std::vector<std::vector<int>>> predictions, Costfunction::TrajectoryData data);
+    double BufferCost(Vehicle vehicle, std::vector<Vehicle::Snapshot> trajectory, std::map<int,std::vector<std::vector<int>>> predictions, Costfunction::TrajectoryData data);
 
-    double calculate_cost(Vehicle& vehicle, std::vector<Vehicle::Snapshot> trajectory, std::map<int,std::vector<std::vector<int>>> predictions, bool verbose);
+    double CalculateCost(Vehicle& vehicle, std::vector<Vehicle::Snapshot> trajectory, std::map<int,std::vector<std::vector<int>>> predictions, bool verbose);
 
-    Costfunction::TrajectoryData get_helper_data(Vehicle vehicle, std::vector<Vehicle::Snapshot> trajectory, std::map<int,std::vector<std::vector<int>>> predictions);
+    Costfunction::TrajectoryData GetHelperData(Vehicle vehicle, std::vector<Vehicle::Snapshot> trajectory, std::map<int,std::vector<std::vector<int>>> predictions);
 
-    bool check_collision(Vehicle::Snapshot snapshot, double s_previous, double s_now);
+    bool CheckCollision(Vehicle::Snapshot snapshot, double s_previous, double s_now);
 
-    std::vector<double>unpack_snapshot(Vehicle::Snapshot snapshot);
+    std::vector<double>UnpackSnapshot(Vehicle::Snapshot snapshot);
 
-    std::map<int,std::vector<std::vector<int>>> filter_predictions_by_lane(std::map<int,std::vector<std::vector<int>>> predictions, int lane);
+    std::map<int,std::vector<std::vector<int>>> FilterPredictionsByLane(std::map<int,std::vector<std::vector<int>>> predictions, int lane);
 };
 
 #endif
