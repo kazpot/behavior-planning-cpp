@@ -71,15 +71,15 @@ public:
 
   void RealizeConstantSpeed();
 
-  int MaxAccelForLane(std::map<int,std::vector<std::vector<int> > > predictions, int lane, int s);
+  int MaxAccelForLane(std::map<int,std::vector<std::vector<int>>> predictions, int lane, int s);
 
-  void RealizeKeepLane(std::map<int, std::vector<std::vector<int> >> predictions);
+  void RealizeKeepLane(std::map<int, std::vector<std::vector<int>>> predictions);
 
   void RealizeLaneChange(std::map<int,std::vector<std::vector<int>>> predictions, std::string direction);
 
   void RealizePrepLaneChange(std::map<int,std::vector<std::vector<int>>> predictions, std::string direction);
 
-  std::vector<std::vector<int> > GeneratePredictions(int horizon);
+  std::vector<std::vector<int>> GeneratePredictions(int horizon);
 
   std::string GetNextState(std::map<int,std::vector<std::vector<int>>> predictions);
 

@@ -18,7 +18,7 @@ double TRAFFIC_DENSITY   = 0.15;
 int MAX_ACCEL = 2;
 
 // s value and lane number of goal.
-std::vector<int> GOAL = {1500, 0};
+std::vector<int> GOAL = {500, 1};
 
 // These affect the visualization
 int FRAMES_PER_SECOND = 4;
