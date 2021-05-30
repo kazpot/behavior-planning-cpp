@@ -55,7 +55,7 @@ public:
 
   void UpdateState(std::map<int, std::vector<std::vector<int>>>& predictions);
 
-  void Configure(std::vector<int> road_data);
+  void Configure(std::vector<int> &road_data);
 
   std::string Display();
 

@@ -32,14 +32,14 @@ void Road::PopulateTraffic()
     {
         int lane_speed = this->lane_speeds[l];
         bool vehicle_just_added = false;
-        for(int s = start_s; s < start_s+this->update_width; ++s)
+        for (int s = start_s; s < start_s+this->update_width; ++s)
         {
-            if(vehicle_just_added)
+            if (vehicle_just_added)
             {
                 vehicle_just_added = false;
             }
 
-            if(((double)rand() / (RAND_MAX)) < this->density)
+            if (((double)rand() / (RAND_MAX)) < this->density)
             {
                 
                 Vehicle vehicle = Vehicle(l,s,lane_speed,0);
@@ -56,7 +56,7 @@ void Road::Advance()
 {
     std::map<int, std::vector<std::vector<int>>> predictions;
     auto it = this->vehicles.begin();
-    while(it != this->vehicles.end())
+    while (it != this->vehicles.end())
     {
         int v_id = it->first;
         std::vector<std::vector<int>> preds = it->second.GeneratePredictions(10);
@@ -65,10 +65,10 @@ void Road::Advance()
     }
 
     it = this->vehicles.begin();
-    while(it != this->vehicles.end())
+    while (it != this->vehicles.end())
     {
         int v_id = it->first;
-        if(v_id == ego_key)
+        if (v_id == ego_key)
         {
             it->second.UpdateState(predictions);
             it->second.RealizeState(predictions);
@@ -90,10 +90,10 @@ void Road::Display(int time_step)
 
     std::vector<std::vector<std::string>> road;
 
-    for(int i = 0; i < this->update_width; ++i)
+    for (int i = 0; i < this->update_width; ++i)
     {
         std::vector<std::string> road_lane;
-        for(int ln = 0; ln < this->num_lanes; ++ln)
+        for (int ln = 0; ln < this->num_lanes; ++ln)
         {
             road_lane.push_back("     ");
         }
@@ -101,16 +101,16 @@ void Road::Display(int time_step)
     }
 
     auto it = this->vehicles.begin();
-    while(it != this->vehicles.end())
+    while (it != this->vehicles.end())
     {
 
         int v_id = it->first;
         Vehicle v = it->second;
 
-        if(s_min <= v.s_ && v.s_ < s_max)
+        if (s_min <= v.s_ && v.s_ < s_max)
         {
             std::string marker = "";
-            if(v_id == this->ego_key)
+            if (v_id == this->ego_key)
             {
                 marker = this->ego_rep;
             }
@@ -121,7 +121,7 @@ void Road::Display(int time_step)
                 std::stringstream buffer;
                 buffer << " ";
                 oss << v_id;
-                for(int buffer_i = oss.str().length(); buffer_i < 3; ++buffer_i)
+                for (int buffer_i = oss.str().length(); buffer_i < 3; ++buffer_i)
                 {
                     buffer << "0";
                 
@@ -136,14 +136,14 @@ void Road::Display(int time_step)
     std::ostringstream oss;
     oss << "+Meters ======================+ step: " << time_step << std::endl;
     int i = s_min;
-    for(int lj = 0; lj < road.size(); ++lj)
+    for (int lj = 0; lj < road.size(); ++lj)
     {
-        if(i % 20 == 0)
+        if (i % 20 == 0)
         {
             std::stringstream buffer;
             std::stringstream dis;
             dis << i;
-            for(int buffer_i = dis.str().length(); buffer_i < 3; ++buffer_i)
+            for (int buffer_i = dis.str().length(); buffer_i < 3; ++buffer_i)
             {
                  buffer << "0";
             }
@@ -156,7 +156,7 @@ void Road::Display(int time_step)
         }          
         ++i;
 
-        for(int li = 0; li < road[0].size(); ++li)
+        for (int li = 0; li < road[0].size(); ++li)
         {
             oss << "|" << road[lj][li];
         }
@@ -170,11 +170,11 @@ void Road::Display(int time_step)
 void Road::AddEgo(int lane_num, int s, std::vector<int> config_data)
 {
     auto it = this->vehicles.begin();
-    while(it != this->vehicles.end())
+    while (it != this->vehicles.end())
     {
         int v_id = it->first;
         Vehicle v = it->second;
-        if(v.lane_ == lane_num && v.s_ == s)
+        if (v.lane_ == lane_num && v.s_ == s)
         {
             this->vehicles.erase(v_id);
         }
@@ -194,7 +194,7 @@ void Road::Cull()
     std::set<std::vector<int>> claimed;
 
     auto it = this->vehicles.begin();
-    while(it != this->vehicles.end())
+    while (it != this->vehicles.end())
     {
         int v_id = it->first;
         Vehicle v = it->second;
@@ -203,11 +203,11 @@ void Road::Cull()
         ++it;
     }
     it = this->vehicles.begin();
-    while(it != this->vehicles.end())
+    while (it != this->vehicles.end())
     {
         int v_id = it->first;
         Vehicle v = it->second;
-        if( (v.s_ > (center_s + this->update_width / 2) ) || (v.s_ < (center_s - this->update_width / 2) ) )
+        if ((v.s_ > (center_s + this->update_width / 2) ) || (v.s_ < (center_s - this->update_width / 2)))
         {
             try {
                 claimed.erase({v.lane_, v.s_});
@@ -218,15 +218,15 @@ void Road::Cull()
             this->vehicles.erase(v_id);
 
             bool placed = false;
-            while(!placed) {
+            while (!placed) {
                 int lane_num = rand() % this->num_lanes;
                 int ds = rand() % 14 + (this->update_width/2-15);
-                if(lane_num > this->num_lanes/2)
+                if (lane_num > this->num_lanes/2)
                 {
                     ds *= -1;
                 }
                 int s = center_s + ds;
-                if(claimed.find({lane_num,s}) != claimed.end())
+                if (claimed.find({lane_num,s}) != claimed.end())
                 {
                     placed = true;
                     int speed = lane_speeds[lane_num];

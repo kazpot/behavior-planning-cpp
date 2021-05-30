@@ -12,15 +12,16 @@ Costfunction::Costfunction() {}
 
 Costfunction::~Costfunction() {}
 
-double Costfunction::ChangeLaneCost(std::vector<Vehicle::Snapshot> trajectory, Costfunction::TrajectoryData data)
+double Costfunction::ChangeLaneCost(std::vector<Vehicle::Snapshot> trajectory, Costfunction::TrajectoryData &trajectory_data)
 {
     // Penalizes lane changes AWAY from the goal lane and rewards
     // lane changes TOWARDS the goal lane.
-    int proposed_lanes = data.end_lanes_from_goal;
+    int proposed_lanes = trajectory_data.end_lanes_from_goal;
     int cur_lane = trajectory[0].lane;
 
     double cost = 0;
-    if (proposed_lanes > cur_lane){
+    if (proposed_lanes > cur_lane)
+    {
         cost = COMFORT;
     }
 
@@ -35,20 +36,21 @@ double Costfunction::ChangeLaneCost(std::vector<Vehicle::Snapshot> trajectory, C
     return cost;
 }
 
-double Costfunction::DistanceFromGoalLane(Costfunction::TrajectoryData &data)
+double Costfunction::DistanceFromGoalLane(Costfunction::TrajectoryData &trajectory_data)
 {
-    int distance = abs(data.end_distance_to_goal);
+    int distance = abs(trajectory_data.end_distance_to_goal);
     distance = std::max(distance, 1);
-    int time_to_goal = distance / data.avg_speed;
-    int lanes = data.end_lanes_from_goal;
-    double multiplier = (double)(5 * lanes / time_to_goal);
+    int time_to_goal = (int)(distance / trajectory_data.avg_speed);
+
+    int lanes = trajectory_data.end_lanes_from_goal;
+    auto multiplier = (double)(5.0 * lanes / time_to_goal);
     double cost = multiplier * REACH_GOAL;
     return cost;
 }
 
-double Costfunction::InefficiencyCost(Vehicle &vehicle, Costfunction::TrajectoryData &data)
+double Costfunction::InefficiencyCost(Vehicle &vehicle, Costfunction::TrajectoryData &trajectory_data)
 {
-    int speed = data.avg_speed;
+    int speed = (int)trajectory_data.avg_speed;
     int target_speed = vehicle.target_speed_;
     int diff = target_speed - speed;
     double pct = double(diff) / target_speed;
@@ -69,15 +71,15 @@ double Costfunction::CollisionCost(Costfunction::TrajectoryData &trajectory_data
     return 0.0;
 }
 
-double Costfunction::BufferCost(Costfunction::TrajectoryData &data)
+double Costfunction::BufferCost(Costfunction::TrajectoryData &trajectory_data)
 {
-    int closest = data.closest_approach;
+    int closest = trajectory_data.closest_approach;
     if (closest == 0)
     {
         return 10 * DANGER;
     }
 
-    int time_steps_away = closest / data.avg_speed;
+    int time_steps_away = (int)(closest / trajectory_data.avg_speed);
     if (time_steps_away > DESIRED_BUFFER)
     {
         return 0.0;

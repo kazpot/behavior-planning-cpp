@@ -42,12 +42,14 @@ std::string Vehicle::GetNextState(std::map<int,std::vector<std::vector<int>>> pr
     double min_cost = std::numeric_limits<double>::infinity();
     int min_index = 0;
     Costfunction cost_function = Costfunction();
-    for (int i = 0; i < states.size(); ++i){
+    for (int i = 0; i < states.size(); ++i)
+    {
         const std::map<int, std::vector<std::vector<int>>> &predictions_copy = predictions;
         std::string st = states.at(i);
         std::vector<Vehicle::Snapshot> trajectory = this->TrajectoryForState(st, predictions_copy);
         double cost = cost_function.CalculateCost(*this, trajectory, predictions, false);
-        if(cost < min_cost){
+        if (cost < min_cost)
+        {
             min_cost = cost;
             min_index = i;
         }
@@ -72,9 +74,9 @@ std::vector<Vehicle::Snapshot> Vehicle::TrajectoryForState(std::string st, std::
         trajectory.push_back(this->GetSnapshot());
         
         // need to remove first prediction for each vehicle
-        for(auto &map : predictions)
+        for (auto &map : predictions)
         {
-            for(auto vehicle : map.second)
+            for (auto vehicle : map.second)
             {
                 vehicle.erase(vehicle.begin());
             }
@@ -107,13 +109,13 @@ Vehicle::Snapshot Vehicle::GetSnapshot()
     return snapshot;
 }
 
-void Vehicle::Configure(std::vector<int> road_data)
+void Vehicle::Configure(std::vector<int> &config_data)
 {
-    this->target_speed_ = road_data[0];
-    this->lanes_available_ = road_data[1];
-    this->max_acceleration_ = road_data[2];
-    this->goal_lane_ = road_data[3];
-    this->goal_s_ = road_data[4];
+    this->target_speed_ = config_data[0];
+    this->lanes_available_ = config_data[1];
+    this->max_acceleration_ = config_data[2];
+    this->goal_lane_ = config_data[3];
+    this->goal_s_ = config_data[4];
 }
 
 std::string Vehicle::Display()
@@ -171,19 +173,19 @@ void Vehicle::RealizeState(std::map<int,std::vector<std::vector<int>>> predictio
     // Given a state, realize it by adjusting acceleration and lane.
     // Note - lane changes happen instantaneously.
     std::string state = this->state_;
-    if(state == "CS")
+    if (state == "CS")
     {
         RealizeConstantSpeed();
     }
-    else if(state == "KL")
+    else if (state == "KL")
     {
         RealizeKeepLane(predictions);
     }
-    else if(state == "LCL")
+    else if (state == "LCL")
     {
         RealizeLaneChange(predictions, "L");
     }
-    else if(state == "LCR")
+    else if (state == "LCR")
     {
         RealizeLaneChange(predictions, "R");
     }
@@ -204,7 +206,7 @@ int Vehicle::MaxAccelForLane(std::map<int, std::vector<std::vector<int>>> predic
     while(it != predictions.end())
     {
         std::vector<std::vector<int>> v = it->second;
-        if((v[0][0] == lane) && (v[0][1] > s))
+        if ((v[0][0] == lane) && (v[0][1] > s))
         {
             in_front.push_back(v);
         }
@@ -215,9 +217,9 @@ int Vehicle::MaxAccelForLane(std::map<int, std::vector<std::vector<int>>> predic
     {
         int min_s = 1000;
         std::vector<std::vector<int>> leading = {};
-        for(auto &i : in_front)
+        for (auto &i : in_front)
         {
-            if((i[0][1] - s) < min_s)
+            if ((i[0][1] - s) < min_s)
             {
                 min_s = i[0][1] - s;
                 leading = i;
@@ -260,10 +262,10 @@ void Vehicle::RealizePrepLaneChange(std::map<int, std::vector<std::vector<int>>>
     int lane = this->lane_ + delta;
     auto it = predictions.begin();
     std::vector<std::vector<std::vector<int>>> at_behind;
-    while(it != predictions.end())
+    while (it != predictions.end())
     {
         std::vector<std::vector<int>> v = it->second;
-        if((v[0][0] == lane) && (v[0][1] <= this->s_))
+        if ((v[0][0] == lane) && (v[0][1] <= this->s_))
         {
             at_behind.push_back(v);
 
@@ -271,22 +273,23 @@ void Vehicle::RealizePrepLaneChange(std::map<int, std::vector<std::vector<int>>>
         ++it;
     }
 
-    if(!at_behind.empty())
+    if (!at_behind.empty())
     {
         int max_s = -1000;
         std::vector<std::vector<int>> nearest_behind = {};
-        for(auto &i : at_behind)
+        for (auto &i : at_behind)
         {
-            if((i[0][1]) > max_s)
+            if ((i[0][1]) > max_s)
             {
                 max_s = i[0][1];
                 nearest_behind = i;
             }
         }
+
         int target_vel = nearest_behind[1][1] - nearest_behind[0][1];
         int delta_v = this->v_ - target_vel;
         int delta_s = this->s_ - nearest_behind[0][1];
-        if(delta_v != 0)
+        if (delta_v != 0)
         {
             int time = -2 * delta_s / delta_v;
             int a;
@@ -299,12 +302,12 @@ void Vehicle::RealizePrepLaneChange(std::map<int, std::vector<std::vector<int>>>
                 a = delta_v/time;
             }
 
-            if(a > this->max_acceleration_)
+            if (a > this->max_acceleration_)
             {
                 a = this->max_acceleration_;
             }
 
-            if(a < -this->max_acceleration_)
+            if (a < -this->max_acceleration_)
             {
                 a = -this->max_acceleration_;
             }
@@ -321,7 +324,7 @@ void Vehicle::RealizePrepLaneChange(std::map<int, std::vector<std::vector<int>>>
 std::vector<std::vector<int>> Vehicle::GeneratePredictions(int horizon = 10)
 {
     std::vector<std::vector<int>> predictions;
-    for( int i = 0; i < horizon; ++i)
+    for ( int i = 0; i < horizon; ++i)
     {
         std::vector<int> pos = StateAt(i);
 

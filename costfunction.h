@@ -48,7 +48,7 @@ public:
     */
     virtual ~Costfunction();
 
-    double ChangeLaneCost(std::vector<Vehicle::Snapshot> trajectory, Costfunction::TrajectoryData data);
+    double ChangeLaneCost(std::vector<Vehicle::Snapshot> trajectory, Costfunction::TrajectoryData &data);
 
     double DistanceFromGoalLane(Costfunction::TrajectoryData &data);
 
