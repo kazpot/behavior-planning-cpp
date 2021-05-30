@@ -51,6 +51,7 @@ int main()
         road.Display(time_step);
         std::this_thread::sleep_for(std::chrono::milliseconds((long)(1.0 / FRAMES_PER_SECOND * 1000)));
     }
+
     Vehicle ego = road.GetEgo();
     if (ego.lane == GOAL[1])
     {

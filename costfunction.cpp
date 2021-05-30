@@ -118,7 +118,7 @@ Costfunction::TrajectoryData Costfunction::GetHelperData(Vehicle vehicle, std::v
     Vehicle::Snapshot last_snap = trajectory.front();
     std::map<int,std::vector<std::vector<int>>> filtered = this->FilterPredictionsByLane(predictions, proposed_lane);
 
-    for(int i = 1; i < PLANNING_HORIZON + 1; i++){
+    for(int i = 1; i < PLANNING_HORIZON + 1; ++i){
         Vehicle::Snapshot ss = trajectory.at(i);
         int lane = ss.lane;
         int s = ss.s;

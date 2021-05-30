@@ -41,7 +41,7 @@ std::string Vehicle::GetNextState(std::map<int,std::vector<std::vector<int>>> pr
     double min_cost = std::numeric_limits<double>::infinity();
     int min_index = 0;
     Costfunction costf = Costfunction();
-    for (int i = 0; i < states.size(); i++){
+    for (int i = 0; i < states.size(); ++i){
         std::map<int,std::vector<std::vector<int>>> predictions_copy = predictions;
         std::string state = states.at(i);
         std::vector<Vehicle::Snapshot> trajectory = this->TrajectoryForState(state,predictions_copy);
@@ -62,7 +62,7 @@ std::vector<Vehicle::Snapshot> Vehicle::TrajectoryForState(std::string state, st
 
     this->state = state;
 
-    for(int i = 0; i < horizon; i++){
+    for(int i = 0; i < horizon; ++i){
         this->RestoreStateFromSnapshot(snap);
         this->state = state;
         this->RealizeState(predictions);
@@ -138,13 +138,13 @@ bool Vehicle::CollidesWith(Vehicle other, int at_time)
     return (check1[0] == check2[0]) && (abs(check1[1]-check2[1]) <= L);
 }
 
-Vehicle::Collider Vehicle::WillCollideWith(Vehicle other, int timesteps)
+Vehicle::Collider Vehicle::WillCollideWith(Vehicle other, int time_steps)
 {
     Vehicle::Collider collider_temp;
     collider_temp.collision = false;
     collider_temp.time = -1; 
 
-    for (int t = 0; t < timesteps+1; t++)
+    for (int t = 0; t < time_steps + 1; ++t)
     {
         if (CollidesWith(other, t) )
         {
@@ -153,7 +153,6 @@ Vehicle::Collider Vehicle::WillCollideWith(Vehicle other, int timesteps)
             return collider_temp;
         }
     }
-
     return collider_temp;
 }
 
@@ -317,7 +316,7 @@ void Vehicle::RealizePrepLaneChange(std::map<int, std::vector<std::vector<int>>>
 std::vector<std::vector<int>> Vehicle::GeneratePredictions(int horizon = 10)
 {
     std::vector<std::vector<int>> predictions;
-    for( int i = 0; i < horizon; i++)
+    for( int i = 0; i < horizon; ++i)
     {
       std::vector<int> check1 = StateAt(i);
       std::vector<int> lane_s = {check1[0], check1[1]};

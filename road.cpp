@@ -28,17 +28,17 @@ Vehicle Road::GetEgo()
 void Road::PopulateTraffic()
 {
     int start_s = std::max(this->camera_center - (this->update_width/2), 0);
-    for (int l = 0; l < this->num_lanes; l++)
+    for (int l = 0; l < this->num_lanes; ++l)
     {
         int lane_speed = this->lane_speeds[l];
         bool vehicle_just_added = false;
-        for(int s = start_s; s < start_s+this->update_width; s++)
+        for(int s = start_s; s < start_s+this->update_width; ++s)
         {
-            
             if(vehicle_just_added)
             {
                 vehicle_just_added = false;
             }
+
             if(((double)rand() / (RAND_MAX)) < this->density)
             {
                 
@@ -92,10 +92,10 @@ void Road::Display(int time_step)
 
     std::vector<std::vector<std::string>> road;
 
-    for(int i = 0; i < this->update_width; i++)
+    for(int i = 0; i < this->update_width; ++i)
     {
         std::vector<std::string> road_lane;
-        for(int ln = 0; ln < this->num_lanes; ln++)
+        for(int ln = 0; ln < this->num_lanes; ++ln)
         {
             road_lane.push_back("     ");
         }
@@ -124,7 +124,7 @@ void Road::Display(int time_step)
                 std::stringstream buffer;
                 buffer << " ";
                 oss << v_id;
-                for(int buffer_i = oss.str().length(); buffer_i < 3; buffer_i++)
+                for(int buffer_i = oss.str().length(); buffer_i < 3; ++buffer_i)
                 {
                     buffer << "0";
                 
@@ -146,7 +146,7 @@ void Road::Display(int time_step)
             std::stringstream buffer;
             std::stringstream dis;
             dis << i;
-            for(int buffer_i = dis.str().length(); buffer_i < 3; buffer_i++)
+            for(int buffer_i = dis.str().length(); buffer_i < 3; ++buffer_i)
             {
                  buffer << "0";
             }
@@ -159,7 +159,7 @@ void Road::Display(int time_step)
         }          
         ++i;
 
-        for(int li = 0; li < road[0].size(); li++)
+        for(int li = 0; li < road[0].size(); ++li)
         {
             oss << "|" << road[lj][li];
         }
